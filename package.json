@@ -1,0 +1,23 @@
+{
+  "name": "n20-trackside",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nitrojoe20/n20-trackside.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nitrojoe20/n20-trackside/issues"
+  },
+  "homepage": "https://github.com/nitrojoe20/n20-trackside#readme",
+  "devDependencies": {
+    "electron": "^31.2.1"
+  }
+}
