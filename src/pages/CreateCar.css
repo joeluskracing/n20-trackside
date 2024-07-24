@@ -1,0 +1,43 @@
+/* src/pages/CreateCar.css */
+
+.create-car {
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .create-car h2 {
+    margin-top: 0;
+  }
+  
+  .create-car form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .create-car label {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .create-car input {
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+  }
+  
+  .create-car button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-car button:hover {
+    background-color: #0056b3;
+  }
+  

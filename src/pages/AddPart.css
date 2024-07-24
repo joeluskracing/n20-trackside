@@ -1,0 +1,62 @@
+/* src/pages/AddPart.css */
+
+.add-part {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.add-part h2 {
+  margin-top: 0;
+}
+
+.add-part form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.add-part label {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-part input,
+.add-part select {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.staged-parts {
+  margin-top: 2rem;
+}
+
+.staged-parts ul {
+  list-style: none;
+  padding: 0;
+}
+
+.staged-parts li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ced4da;
+}
+
+.staged-parts button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+}
+
+.staged-parts button:hover {
+  text-decoration: underline;
+}

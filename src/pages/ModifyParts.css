@@ -1,0 +1,104 @@
+.modify-parts {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.grid-box {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.grid-cell {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.grid-cell h3 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.grid-cell h4 {
+  margin: 10px 0 5px;
+  font-size: 1em;
+}
+
+.grid-cell ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.grid-cell ul li {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.grid-cell ul li button {
+  margin-left: 10px;
+}
+
+.staged-deletions {
+  background-color: red;
+  color: white;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.staged-deletions ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.staged-deletions li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.staged-deletions button {
+  margin-right: 10px;
+}
+
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.lightbox-content h2 {
+  margin-bottom: 10px;
+}
+
+.lightbox-content p {
+  margin-bottom: 20px;
+}
+
+.lightbox-content button {
+  margin: 0 10px;
+}

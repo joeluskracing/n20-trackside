@@ -1,0 +1,36 @@
+/* src/components/Navbar.css */
+
+.navbar {
+    background-color: #f8f9fa;
+    padding: 1rem;
+  }
+  
+  .navbar-list {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .navbar-item {
+    display: inline;
+  }
+  
+  .navbar-item a {
+    text-decoration: none;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navbar-item a:hover {
+    background-color: #e2e6ea;
+  }
+  
+  .navbar-item a.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
