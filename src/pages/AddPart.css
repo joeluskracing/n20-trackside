@@ -1,5 +1,3 @@
-/* src/pages/AddPart.css */
-
 .add-part {
   padding: 2rem;
   max-width: 600px;
@@ -16,9 +14,16 @@
   gap: 1rem;
 }
 
-.add-part label {
+.add-part label.form-label {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.add-part label.form-label .required {
+  color: red;
+  margin-left: 0.5rem;
+  display: inline;
 }
 
 .add-part input,
@@ -28,9 +33,30 @@
   border-radius: 4px;
 }
 
+.add-part small {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+.add-part .error {
+  color: red;
+  font-size: 0.8rem;
+}
+
 .checkbox-group {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-group > div {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group input {
+  margin-right: 0.5rem;
 }
 
 .staged-parts {
@@ -51,12 +77,18 @@
 }
 
 .staged-parts button {
-  background: none;
-  border: none;
-  color: red;
   cursor: pointer;
+}
+
+#btnFormSubmit{
+  width:100%;
 }
 
 .staged-parts button:hover {
   text-decoration: underline;
+}
+
+button[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
