@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, Op, DataTypes } = require('sequelize');
 const path = require('path');
 
 // Initialize SQLite database
@@ -102,6 +102,10 @@ const Session = sequelize.define('Session', {
     type: DataTypes.DATE,
     allowNull: false
   },
+  name:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   type: {
     type: DataTypes.STRING,
     allowNull: false
@@ -126,7 +130,7 @@ const PartsValues = sequelize.define('PartsValues', {
   },
   value: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   }
 }, {
   timestamps: true
@@ -155,17 +159,17 @@ const SessionPartsValues = sequelize.define('SessionPartsValues', {
 });
 
 // Define relationships
-Car.hasMany(Part, { foreignKey: 'carId' });
-Part.belongsTo(Car, { foreignKey: 'carId' });
+Car.hasMany(Part, { foreignKey: 'carId', onDelete: 'CASCADE' });
+Part.belongsTo(Car, { foreignKey: 'carId', onDelete: 'CASCADE' });
 
-Event.hasMany(Session, { foreignKey: 'eventId' });
-Session.belongsTo(Event, { foreignKey: 'eventId' });
+Event.hasMany(Session, { as: 'Sessions', foreignKey: 'eventId', onDelete: 'CASCADE' });
+Session.belongsTo(Event, { foreignKey: 'eventId', onDelete: 'CASCADE' });
 
-Part.hasMany(PartsValues, { foreignKey: 'partId' });
-PartsValues.belongsTo(Part, { foreignKey: 'partId' });
+Part.hasMany(PartsValues, { foreignKey: 'partId', onDelete: 'CASCADE' });
+PartsValues.belongsTo(Part, { foreignKey: 'partId', onDelete: 'CASCADE' });
 
-Session.hasMany(SessionPartsValues, { foreignKey: 'sessionId' });
-SessionPartsValues.belongsTo(Session, { foreignKey: 'sessionId' });
+Session.hasMany(SessionPartsValues, { foreignKey: 'sessionId', onDelete: 'CASCADE' });
+SessionPartsValues.belongsTo(Session, { foreignKey: 'sessionId', onDelete: 'CASCADE' });
 
 // Sync database
 sequelize.sync().then(() => {
@@ -179,5 +183,6 @@ module.exports = {
   Event,
   Session,
   PartsValues,
-  SessionPartsValues
+  SessionPartsValues,
+  Op
 };

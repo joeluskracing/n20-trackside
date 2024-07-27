@@ -8,11 +8,12 @@ import Settings from './pages/Settings';
 import CreateCar from './pages/CreateCar';
 import AddPart from './pages/AddPart';
 import ModifyParts from './pages/ModifyParts';
+import { CarProvider } from './context/CarContext'; // Import the CarProvider
 import './App.css';
 
 const App = () => {
   return (
-    <div>
+    <CarProvider>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -24,7 +25,7 @@ const App = () => {
         <Route path="/modify-parts" element={<ModifyParts />} />
         {/* Add more routes as needed */}
       </Routes>
-    </div>
+    </CarProvider>
   );
 };
 

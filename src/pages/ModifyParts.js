@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ModifyParts.css';
+import { useCar } from '../context/CarContext';
 
 const ModifyParts = () => {
-  const { state } = useLocation();
-  const { carId, carName } = state || {};
+  const { selectedCar: carId, carName } = useCar();
   const [parts, setParts] = useState([]);
   const [groupedParts, setGroupedParts] = useState({});
   const [stagedDeletions, setStagedDeletions] = useState([]);
@@ -18,11 +18,15 @@ const ModifyParts = () => {
   }, [carId]);
 
   const loadParts = async () => {
-    const fetchedParts = await window.api.getParts(carId);
-    const uniqueParts = ensureUniqueOrder(fetchedParts);
-    const sortedParts = uniqueParts.sort((a, b) => a.order - b.order);
-    setParts(sortedParts);
-    groupPartsByLocation(sortedParts);
+    try {
+      const fetchedParts = await window.api.getParts(carId);
+      const uniqueParts = ensureUniqueOrder(fetchedParts);
+      const sortedParts = uniqueParts.sort((a, b) => a.order - b.order);
+      setParts(sortedParts);
+      groupPartsByLocation(sortedParts);
+    } catch (error) {
+      console.error('Error loading parts:', error);
+    }
   };
 
   const ensureUniqueOrder = (parts) => {
@@ -49,9 +53,10 @@ const ModifyParts = () => {
       orderValue++;
     });
 
-    // Save the new unique order values to the database
     parts.forEach((part) => {
-      window.api.updatePartOrder(part.id, part.order);
+      if (!part.order) {
+        window.api.updatePartOrder(part.id, part.order);
+      }
     });
 
     return parts;
@@ -93,10 +98,16 @@ const ModifyParts = () => {
 
     setParts(updatedParts);
     groupPartsByLocation(updatedParts);
+  };
 
-    updatedParts.forEach((part) => {
+  const saveReorderedParts = () => {
+    console.log('Save button pressed');
+    parts.forEach((part) => {
+      console.log(`Saving part order: ${part.id} - ${part.order}`);
       window.api.updatePartOrder(part.id, part.order);
     });
+    console.log('Changes saved successfully.');
+    alert('Changes saved successfully.');
   };
 
   const stageDeletion = (partId) => {
@@ -138,6 +149,7 @@ const ModifyParts = () => {
     <div className="modify-parts">
       <div className="grid-box">
         <h2>Parts Layout</h2>
+        <button className="save-changes" onClick={saveReorderedParts}>Save Changes</button>
         {stagedDeletions.length > 0 && (
           <div className="staged-deletions">
             <h3>Staged Deletions</h3>

@@ -1,33 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Garage.css';
+import { useCar } from '../context/CarContext';
+import { Menu, Item, contextMenu } from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.css';
 
 const Garage = () => {
-  const { state } = useLocation();
-  const { carId, carName } = state || {};
+  const { selectedCar: carId, carName } = useCar();
   const [parts, setParts] = useState([]);
   const [groupedParts, setGroupedParts] = useState({});
   const [sessions, setSessions] = useState([]);
   const [values, setValues] = useState({});
   const [showTableLightbox, setShowTableLightbox] = useState(false);
   const [currentPart, setCurrentPart] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [editingEventId, setEditingEventId] = useState(null);
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [editingName, setEditingName] = useState('');
+  const [sessionTitle, setSessionTitle] = useState('');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [clickTimer, setClickTimer] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (carId) {
       loadParts();
+      loadEventsWithSessions();
+      setSessionTitle(`Current Setup at ${new Date().toLocaleString()}`);
     }
-  }, [carId]);
+  }, [carId, carName]);
 
   const loadParts = async () => {
     try {
       const fetchedParts = await window.api.getParts(carId);
       const partsValues = await window.api.getPartsValues();
+
       const uniqueParts = ensureUniqueOrder(fetchedParts);
       const sortedParts = uniqueParts.sort((a, b) => a.order - b.order);
       setParts(sortedParts);
+
+      await initializeValues(sortedParts, partsValues);
       groupPartsByLocation(sortedParts);
-      initializeValues(partsValues);
     } catch (error) {
       console.error('Error loading parts:', error);
     }
@@ -58,7 +72,9 @@ const Garage = () => {
     });
 
     parts.forEach((part) => {
-      window.api.updatePartOrder(part.id, part.order);
+      if (!part.order) {
+        window.api.updatePartOrder(part.id, part.order);
+      }
     });
 
     return parts;
@@ -80,24 +96,51 @@ const Garage = () => {
     setGroupedParts(grouped);
   };
 
-  const initializeValues = (partsValues) => {
-    const initialValues = partsValues.reduce((acc, partValue) => {
-      acc[partValue.partId] = partValue.value;
-      return acc;
-    }, {});
+  const initializeValues = async (parts, partsValues) => {
+    const initialValues = {};
+
+    for (const part of parts) {
+      let partValue = partsValues.find((pv) => pv.partId === part.id);
+      if (!partValue) {
+        partValue = await window.api.addPartValue(part.id, null);
+        initialValues[part.id] = '';
+      } else {
+        initialValues[part.id] = partValue.value;
+      }
+    }
+
     setValues(initialValues);
+  };
+
+  const loadEventsWithSessions = async () => {
+    try {
+      const fetchedEvents = await window.api.getEventsWithSessions();
+      const sortedEvents = fetchedEvents.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setEvents(sortedEvents);
+    } catch (error) {
+      console.error('Error loading events with sessions:', error);
+    }
   };
 
   const handleChange = (partId, value) => {
     setValues({ ...values, [partId]: value });
+    if (!sessionTitle.startsWith("Modified from")) {
+      setSessionTitle(`Modified from ${sessionTitle.split(' at ')[0]} at ${new Date().toLocaleString()}`);
+    }
   };
 
   const handleIncrement = (partId) => {
     setValues({ ...values, [partId]: (values[partId] || 0) + 1 });
+    if (!sessionTitle.startsWith("Modified from")) {
+      setSessionTitle(`Modified from ${sessionTitle.split(' at ')[0]} at ${new Date().toLocaleString()}`);
+    }
   };
 
   const handleDecrement = (partId) => {
     setValues({ ...values, [partId]: (values[partId] || 0) - 1 });
+    if (!sessionTitle.startsWith("Modified from")) {
+      setSessionTitle(`Modified from ${sessionTitle.split(' at ')[0]} at ${new Date().toLocaleString()}`);
+    }
   };
 
   const handleTableLinkClick = (part) => {
@@ -111,18 +154,147 @@ const Garage = () => {
   };
 
   const handleSubmit = async () => {
-    const today = new Date().toISOString().split('T')[0];
+    try {
+      // Update all part values
+      for (const partId in values) {
+        await window.api.updatePartValue(partId, values[partId]);
+      }
 
-    let event = await window.api.getEventByDate(today);
-    if (!event) {
-      event = await window.api.addEvent(`Garage on ${today}`, today);
+      // Check for events in the last 24 hours
+      const recentEvents = await window.api.getEventsInLast24Hours();
+      let eventId;
+
+      if (recentEvents.length > 0) {
+        const recentEvent = recentEvents[0];
+        const useRecentEvent = confirm(`Would you like to add log entries to ${recentEvent.name} at ${recentEvent.date}? If not, a new event will be created.`);
+        if (useRecentEvent) {
+          eventId = recentEvent.id;
+        } else {
+          const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
+          eventId = newEvent.id;
+        }
+      } else {
+        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
+        eventId = newEvent.id;
+      }
+
+      // Fetch existing sessions for the event
+      const existingSessions = await window.api.getSessions(eventId);
+      const sessionCount = existingSessions.length;
+
+      // Add new session with the current title
+      const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
+
+      // Add session parts values
+      await window.api.addSessionPartsValue(newSession.id, values);
+
+      // Update session list
+      loadEventsWithSessions();
+    } catch (error) {
+      console.error('Error during submit:', error);
     }
+  };
 
-    const session = await window.api.addSession(event.id, today, 'garage');
+  const handleEventClick = (eventId) => {
+    setSelectedEventId(eventId);
+  };
 
-    await window.api.addSessionPartsValue(session.id, values);
+  const handleSessionClick = async (session) => {
+    const loadSession = confirm(`Would you like to load ${session.name}?`);
+    if (loadSession) {
+      const sessionPartsValues = await window.api.getSessionPartsValuesBySessionId(session.id);
+      if (sessionPartsValues) {
+        setValues(sessionPartsValues.values);
+        setSessionTitle(session.name);
+      }
+    }
+  };
 
-    navigate('/');
+  const handleSingleClick = (session) => {
+    if (!clickTimer) {
+      setClickTimer(setTimeout(() => {
+        handleSessionClick(session);
+        setClickTimer(null);
+      }, 200)); // Adjust delay as needed
+    }
+  };
+
+  const handleDoubleClick = (session) => {
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+      setClickTimer(null);
+    }
+    handleSessionDoubleClick(session);
+  };
+
+  const handleSessionDoubleClick = (session) => {
+    setEditingSessionId(session.id);
+    setEditingName(session.name);
+  };
+
+  const handleEventDoubleClick = (event) => {
+    setEditingEventId(event.id);
+    setEditingName(event.name);
+  };
+
+  const handleEditingNameChange = (e) => {
+    setEditingName(e.target.value);
+  };
+
+  const handleEditingNameBlur = async () => {
+    try {
+      if (editingEventId) {
+        await window.api.updateEventName(editingEventId, editingName);
+      } else if (editingSessionId) {
+        await window.api.updateSessionName(editingSessionId, editingName);
+      }
+      setEditingEventId(null);
+      setEditingSessionId(null);
+      loadEventsWithSessions();
+    } catch (error) {
+      console.error('Error updating name:', error);
+    }
+  };
+
+  const handleTitleDoubleClick = () => {
+    setEditingTitle(true);
+    setEditingName(sessionTitle);
+  };
+
+  const handleTitleChange = (e) => {
+    setEditingName(e.target.value);
+  };
+
+  const handleTitleBlur = () => {
+    setSessionTitle(editingName);
+    setEditingTitle(false);
+  };
+
+  const handleContextMenu = (e, item, type) => {
+    e.preventDefault();
+    contextMenu.show({
+      id: type === 'event' ? 'event-menu' : 'session-menu',
+      event: e,
+      props: { item }
+    });
+  };
+
+  const handleDeleteEvent = async ({ props }) => {
+    try {
+      await window.api.deleteEvent(props.item.id);
+      loadEventsWithSessions();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
+
+  const handleDeleteSession = async ({ props }) => {
+    try {
+      await window.api.deleteSession(props.item.id);
+      loadEventsWithSessions();
+    } catch (error) {
+      console.error('Error deleting session:', error);
+    }
   };
 
   const displayGrid = [
@@ -137,22 +309,72 @@ const Garage = () => {
     <div className="garage">
       <div className="left-column">
         <h2>Garage Mode</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Sessions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map((session, index) => (
-              <tr key={index}>
-                <td>{session.name}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {events.length > 0 ? (
+          events.map((event, index) => (
+            <div key={index}>
+              {editingEventId === event.id ? (
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={handleEditingNameChange}
+                  onBlur={handleEditingNameBlur}
+                  autoFocus
+                />
+              ) : (
+                <h3
+                  onClick={() => handleEventClick(event.id)}
+                  onDoubleClick={() => handleEventDoubleClick(event)}
+                  onContextMenu={(e) => handleContextMenu(e, event, 'event')}
+                >
+                  {event.name}
+                </h3>
+              )}
+              {selectedEventId === event.id && (
+                <ul>
+                  {event.Sessions && event.Sessions.length > 0 ? (
+                    event.Sessions.map((session, index) => (
+                      <li
+                        key={index}
+                        onClick={() => handleSingleClick(session)}
+                        onDoubleClick={() => handleDoubleClick(session)}
+                        onContextMenu={(e) => handleContextMenu(e, session, 'session')}
+                      >
+                        {editingSessionId === session.id ? (
+                          <input
+                            type="text"
+                            value={editingName}
+                            onChange={handleEditingNameChange}
+                            onBlur={handleEditingNameBlur}
+                            autoFocus
+                          />
+                        ) : (
+                          session.name
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No sessions available for this event</li>
+                  )}
+                </ul>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No events available. Save changes to initialize an event.</p>
+        )}
       </div>
       <div className="right-column">
+        {editingTitle ? (
+          <input
+            type="text"
+            value={editingName}
+            onChange={handleTitleChange}
+            onBlur={handleTitleBlur}
+            autoFocus
+          />
+        ) : (
+          <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
+        )}
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <div className="parts-grid">
           {displayGrid.flat().map((location) => (
@@ -204,6 +426,12 @@ const Garage = () => {
           </div>
         </div>
       )}
+      <Menu id="event-menu">
+        <Item onClick={handleDeleteEvent}>Delete Event</Item>
+      </Menu>
+      <Menu id="session-menu">
+        <Item onClick={handleDeleteSession}>Delete Session</Item>
+      </Menu>
     </div>
   );
 };
