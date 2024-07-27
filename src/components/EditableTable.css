@@ -1,0 +1,45 @@
+.editable-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .editable-table th,
+  .editable-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .editable-table th {
+    background-color: #f0f0f0;
+    position: relative;
+  }
+  
+  .editable-table input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    background: none;
+    padding: 8px;
+  }
+  
+  .editable-table th button,
+  .editable-table td button {
+    background: none;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .editable-table th button {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  
+  .editable-table td button {
+    display: block;
+    margin: 0 auto;
+  }
+  

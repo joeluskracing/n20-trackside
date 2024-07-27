@@ -129,7 +129,7 @@ const PartsValues = sequelize.define('PartsValues', {
     onDelete: 'CASCADE'
   },
   value: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true
   }
 }, {

@@ -64,7 +64,13 @@ contextBridge.exposeInMainWorld('api', {
     }
   },
   addEvent: async (name, date) => {
-    return await Event.create({ name, date });
+    try {
+      const event = await Event.create({ name, date });
+      return event.toJSON(); // Return the full event object including its ID
+    } catch (error) {
+      console.error('Error adding event:', error);
+      throw error;
+    }
   },
   getEventByDate: async (date) => {
     try {

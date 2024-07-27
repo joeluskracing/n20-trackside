@@ -4,6 +4,7 @@ import './Garage.css';
 import { useCar } from '../context/CarContext';
 import { Menu, Item, contextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
+import EditableTable from '../components/EditableTable';
 
 const Garage = () => {
   const { selectedCar: carId, carName } = useCar();
@@ -161,21 +162,25 @@ const Garage = () => {
       }
 
       // Check for events in the last 24 hours
-      const recentEvents = await window.api.getEventsInLast24Hours();
       let eventId;
-
-      if (recentEvents.length > 0) {
-        const recentEvent = recentEvents[0];
-        const useRecentEvent = confirm(`Would you like to add log entries to ${recentEvent.name} at ${recentEvent.date}? If not, a new event will be created.`);
-        if (useRecentEvent) {
-          eventId = recentEvent.id;
+      if (events.length === 0) {
+        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
+        eventId = newEvent.id;
+      } else {
+        const recentEvents = await window.api.getEventsInLast24Hours();
+        if (recentEvents.length > 0) {
+          const recentEvent = recentEvents[0];
+          const useRecentEvent = confirm(`Would you like to add log entries to ${recentEvent.name} at ${recentEvent.date}? If not, a new event will be created.`);
+          if (useRecentEvent) {
+            eventId = recentEvent.id;
+          } else {
+            const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
+            eventId = newEvent.id;
+          }
         } else {
           const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
           eventId = newEvent.id;
         }
-      } else {
-        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
-        eventId = newEvent.id;
       }
 
       // Fetch existing sessions for the event
@@ -373,7 +378,7 @@ const Garage = () => {
             autoFocus
           />
         ) : (
-          <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
+          <h2 onDoubleClick={handleTitleDoubleClick} className="session-title">{sessionTitle}</h2>
         )}
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <div className="parts-grid">
@@ -385,17 +390,18 @@ const Garage = () => {
                   <h4>{subheading}</h4>
                   <ul>
                     {groupedParts[location][subheading].map((part, index) => (
-                      <li key={part.id}>
-                        {part.name}
+                      <li key={part.id} className="part-input">
+                        <span className="part-name">{part.name}</span>
                         {part.entryType === 'text' && (
                           <input
                             type="text"
                             value={values[part.id] || ''}
                             onChange={(e) => handleChange(part.id, e.target.value)}
+                            className="center-input"
                           />
                         )}
                         {part.entryType === 'number' && (
-                          <div className="number-input">
+                          <div className="number-input center-input">
                             <button onClick={() => handleDecrement(part.id)}>-</button>
                             <input
                               type="number"
@@ -421,7 +427,10 @@ const Garage = () => {
         <div className="lightbox">
           <div className="lightbox-content">
             <h2>{currentPart.name} Table</h2>
-            {/* Add your table content here */}
+            <EditableTable 
+              value={values[currentPart.id]} 
+              onChange={(newValue) => handleChange(currentPart.id, newValue)} 
+            />
             <button onClick={handleTableLightboxClose}>Close</button>
           </div>
         </div>
