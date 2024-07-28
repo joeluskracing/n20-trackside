@@ -6,8 +6,17 @@ import { useEvent } from '../context/EventContext';
 import Modal from 'react-modal';
 import { Menu, Item, contextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
+import EditableTable from '../components/EditableTable';
 
 Modal.setAppElement('#root'); // Set the app element for accessibility
+
+const gridLayout = [
+  ["Top Left", "Top Middle", "Top Right"],
+  ["LF", "Engine", "RF"],
+  ["Driver", "Center", "Passenger"],
+  ["LR", "Differential", "RR"],
+  ["Bottom Left", "Bottom Middle", "Bottom Right"]
+];
 
 const Trackside = () => {
   const { selectedCar: carId } = useCar();
@@ -27,6 +36,10 @@ const Trackside = () => {
   const [values, setValues] = useState({});
   const [preSessionNotes, setPreSessionNotes] = useState([]);
   const [postSessionNotes, setPostSessionNotes] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAll, setShowAll] = useState(false);
+  const [showTableLightbox, setShowTableLightbox] = useState(false);
+  const [currentPart, setCurrentPart] = useState(null);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
@@ -55,7 +68,7 @@ const Trackside = () => {
   const loadEvents = async () => {
     try {
       const fetchedEvents = await window.api.getEventsWithSessions();
-      const filteredEvents = fetchedEvents.filter(event => event.carId === carId && event.trackId !== 1); // 1 is the ID for the "Garage" track
+      const filteredEvents = fetchedEvents.filter(event => event.carId == carId && event.trackId !== 1); // 1 is the ID for the "Garage" track
       setEvents(filteredEvents);
     } catch (error) {
       console.error('Error loading events:', error);
@@ -89,19 +102,19 @@ const Trackside = () => {
       const fetchedParts = await window.api.getParts(carId);
       const partsValues = await window.api.getPartsValues() || [];
       const sessionPartsValues = await window.api.getSessionPartsValuesBySessionId(sessionId) || {};
-
+  
       const uniqueParts = ensureUniqueOrder(fetchedParts);
       const sortedParts = uniqueParts.sort((a, b) => a.order - b.order);
       setParts(sortedParts);
-
+  
       const initialValues = {};
       for (const part of sortedParts) {
-        const sessionPartValue = sessionPartsValues[part.id];
-        const partValue = partsValues.find(pv => pv.partId === part.id);
+        const sessionPartValue = sessionPartsValues.values ? sessionPartsValues.values[part.id] : undefined;
+        const partValue = partsValues.find(pv => pv.partId == part.id);
         initialValues[part.id] = sessionPartValue !== undefined ? sessionPartValue : (partValue ? partValue.value : '');
       }
       setValues(initialValues);
-
+  
       groupPartsByLocation(sortedParts);
     } catch (error) {
       console.error('Error loading parts:', error);
@@ -187,7 +200,7 @@ const Trackside = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let trackId = tracks.find(track => track.name === selectedTrack)?.id;
+    let trackId = tracks.find(track => track.name == selectedTrack)?.id;
     if (!trackId) {
       const newTrack = await window.api.addTrack(selectedTrack);
       trackId = newTrack.id;
@@ -306,6 +319,16 @@ const Trackside = () => {
     setValues({ ...values, [partId]: (values[partId] || 0) - 1 });
   };
 
+  const handleTableLinkClick = (part) => {
+    setCurrentPart(part);
+    setShowTableLightbox(true);
+  };
+
+  const handleTableLightboxClose = () => {
+    setShowTableLightbox(false);
+    setCurrentPart(null);
+  };
+
   const handleSetupSubmit = async () => {
     try {
       // Update all part values
@@ -320,7 +343,7 @@ const Trackside = () => {
       }
 
       // Add new session parts values
-      await window.api.addSessionPartsValue(currentSession, values);
+      await window.api.addSessionPartsValue2(currentSession, values);
 
       // Save notes
       await window.api.updatePreSessionNotes(currentSession, preSessionNotes);
@@ -347,30 +370,40 @@ const Trackside = () => {
 
   const renderNotesForm = (notes, setNotes) => {
     return notes.map((note, index) => (
-      <div key={index}>
-        <label>{note.title}</label>
-        {note.type === 'Text' ? (
-          <input
-            type="text"
-            value={note.value || ''}
-            onChange={(e) => {
-              const newNotes = [...notes];
-              newNotes[index].value = e.target.value;
-              setNotes(newNotes);
-            }}
-          />
-        ) : note.type === 'Paragraph' ? (
-          <textarea
-            value={note.value || ''}
-            onChange={(e) => {
-              const newNotes = [...notes];
-              newNotes[index].value = e.target.value;
-              setNotes(newNotes);
-            }}
-          />
-        ) : null}
+      <div className="notes-row" key={index}>
+        <div className="notes-label">{note.title}</div>
+        <div className="notes-input">
+          {note.type === 'Text' ? (
+            <input
+              type="text"
+              value={note.value || ''}
+              onChange={(e) => {
+                const newNotes = [...notes];
+                newNotes[index].value = e.target.value;
+                setNotes(newNotes);
+              }}
+            />
+          ) : note.type === 'Paragraph' ? (
+            <textarea
+              value={note.value || ''}
+              onChange={(e) => {
+                const newNotes = [...notes];
+                newNotes[index].value = e.target.value;
+                setNotes(newNotes);
+              }}
+            />
+          ) : null}
+        </div>
       </div>
     ));
+  };
+
+  const handleShowAll = () => {
+    setShowAll(true);
+  };
+
+  const handleHideAll = () => {
+    setShowAll(false);
   };
 
   return (
@@ -383,7 +416,7 @@ const Trackside = () => {
               {sessions.map((session, index) => (
                 <li
                   key={index}
-                  className={session.id === currentSession ? 'selected' : ''}
+                  className={session.id == currentSession ? 'selected' : ''}
                   onClick={() => handleSessionClick(session.id)}
                 >
                   {session.name || session}
@@ -399,52 +432,78 @@ const Trackside = () => {
             </div>
             <div className="box">
               <h2>Setup</h2>
-              <div className="parts-grid">
-                {Object.keys(groupedParts).map(location => (
-                  <div key={location} className="grid-cell">
-                    <h3>{location}</h3>
-                    {Object.keys(groupedParts[location]).map(subheading => (
-                      <div key={subheading}>
-                        <h4>{subheading}</h4>
-                        <ul>
-                          {groupedParts[location][subheading].map((part, index) => (
-                            <li key={part.id}>
-                              {part.name}
-                              {part.entryType === 'text' && (
-                                <input
-                                  type="text"
-                                  value={values[part.id] || ''}
-                                  onChange={(e) => handleChange(part.id, e.target.value)}
-                                />
-                              )}
-                              {part.entryType === 'number' && (
-                                <div className="number-input">
-                                  <button onClick={() => handleDecrement(part.id)}>-</button>
-                                  <input
-                                    type="number"
-                                    value={values[part.id] || 0}
-                                    onChange={(e) => handleChange(part.id, Number(e.target.value))}
-                                  />
-                                  <button onClick={() => handleIncrement(part.id)}>+</button>
-                                </div>
-                              )}
-                              {part.entryType === 'table' && (
-                                <button onClick={() => handleTableLinkClick(part)}>Table</button>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
+              <div className="search-controls">
+                <input
+                  type="text"
+                  placeholder="Search Parts"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button
+                  className={showAll ? 'active' : ''}
+                  onClick={handleShowAll}
+                >
+                  Show All
+                </button>
+                <button
+                  className={!showAll ? 'active' : ''}
+                  onClick={handleHideAll}
+                >
+                  Hide All
+                </button>
+              </div>
+              <div className="parts-grid2">
+                {gridLayout.map((row, rowIndex) => (
+                  <div key={rowIndex} className="grid-row">
+                    {row.map((location) => (
+                      <div key={location} className="grid-cell">
+                        <h3>{location}</h3>
+                        {Object.keys(groupedParts[location] || {}).map(subheading => (
+                          <div key={subheading}>
+                            <h4>{subheading}</h4>
+                            <ul>
+                              {(groupedParts[location][subheading] || [])
+                                .filter(part => showAll || part.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                .map((part, index) => (
+                                  <li key={part.id}>
+                                    {part.name}
+                                    {part.entryType == 'text' && (
+                                      <input
+                                        type="text"
+                                        value={values[part.id] || ''}
+                                        onChange={(e) => handleChange(part.id, e.target.value)}
+                                      />
+                                    )}
+                                    {part.entryType == 'number' && (
+                                      <div className="number-input">
+                                        <button onClick={() => handleDecrement(part.id)}>-</button>
+                                        <input
+                                          type="number"
+                                          value={values[part.id] || 0}
+                                          onChange={(e) => handleChange(part.id, Number(e.target.value))}
+                                        />
+                                        <button onClick={() => handleIncrement(part.id)}>+</button>
+                                      </div>
+                                    )}
+                                    {part.entryType == 'table' && (
+                                      <button onClick={() => handleTableLinkClick(part)}>Table</button>
+                                    )}
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
                 ))}
               </div>
-              <button onClick={handleSetupSubmit}>Submit Setup</button>
             </div>
             <div className="box">
               <h2>Post-Session Notes</h2>
               {renderNotesForm(postSessionNotes, setPostSessionNotes)}
             </div>
+            <button className="save-notes" onClick={handleSetupSubmit}>Save Notes</button>
           </div>
         </div>
       ) : (
@@ -544,6 +603,18 @@ const Trackside = () => {
             </div>
           )}
         </>
+      )}
+      {showTableLightbox && (
+        <div className="lightbox">
+          <div className="lightbox-content">
+            <h2>{currentPart.name} Table</h2>
+            <EditableTable 
+              value={values[currentPart.id]} 
+              onChange={(newValue) => handleChange(currentPart.id, newValue)} 
+            />
+            <button onClick={handleTableLightboxClose}>Close</button>
+          </div>
+        </div>
       )}
       <Modal
         isOpen={isModalOpen}

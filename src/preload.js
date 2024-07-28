@@ -125,6 +125,18 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error adding session parts value:', error);
     }
   },
+  addSessionPartsValue2: async (sessionId, values) => {
+    try {
+      const existingEntry = await SessionPartsValues.findOne({ where: { sessionId } });
+      if (existingEntry) {
+        await SessionPartsValues.update({ values }, { where: { sessionId } });
+      } else {
+        await SessionPartsValues.create({ sessionId, values });
+      }
+    } catch (error) {
+      console.error('Error adding/updating session parts value:', error);
+    }
+  },
   setLastSelectedSession: async (sessionId) => {
     await Session.update({ lastSelected: false }, { where: {} });
     return await Session.update({ lastSelected: true }, { where: { id: sessionId } });
@@ -255,22 +267,33 @@ contextBridge.exposeInMainWorld('api', {
   },
   updatePreSessionNotes: async (sessionId, notes) => {
     try {
-      await PreSessionNotes.update({ notes }, { where: { sessionId } });
+      const existingEntry = await PreSessionNotes.findOne({ where: { sessionId } });
+      if (existingEntry) {
+        await PreSessionNotes.update({ notes }, { where: { sessionId } });
+      } else {
+        await PreSessionNotes.create({ sessionId, notes });
+      }
     } catch (error) {
       console.error('Error updating pre-session notes:', error);
     }
   },
   updatePostSessionNotes: async (sessionId, notes) => {
     try {
-      await PostSessionNotes.update({ notes }, { where: { sessionId } });
+      const existingEntry = await PostSessionNotes.findOne({ where: { sessionId } });
+      if (existingEntry) {
+        await PostSessionNotes.update({ notes }, { where: { sessionId } });
+      } else {
+        await PostSessionNotes.create({ sessionId, notes });
+      }
     } catch (error) {
       console.error('Error updating post-session notes:', error);
     }
   },
   deleteSessionPartsValuesBySessionId: async (sessionId) => {
-    const result = await db.SessionPartsValues.destroy({
-      where: { sessionId }
-    });
-    return result;
+    try {
+      await SessionPartsValues.destroy({ where: { sessionId } });
+    } catch (error) {
+      console.error('Error deleting session parts values:', error);
+    }
   }
 });
