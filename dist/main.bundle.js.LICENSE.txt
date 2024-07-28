@@ -7,6 +7,8 @@
  * A port of inflection-js to node.js module.
  */
 
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
 /**
  * @license
  * Lodash <https://lodash.com/>

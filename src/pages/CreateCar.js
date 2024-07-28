@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateCar.css';
+import { useCar } from '../context/CarContext';
 
 const CreateCar = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
+  const { loadCars } = useCar(); // Get loadCars from context
 
   const handleCreateCar = () => {
     window.api.addCar(name).then(() => {
+      loadCars(); // Update the cars list
       navigate('/'); // Navigate back to home after creating the car
     });
   };

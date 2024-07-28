@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
 
 const Home = () => {
-  const { cars, selectedCar, setSelectedCar } = useCar();
+  const { cars, selectedCar, setSelectedCar, loadCars } = useCar();
   const [parts, setParts] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    loadCars();
+  }, []);
 
   useEffect(() => {
     if (selectedCar) {

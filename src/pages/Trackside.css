@@ -1,0 +1,65 @@
+.trackside {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .dashboard {
+    display: flex;
+    width: 100%;
+  }
+  
+  .left-column {
+    width: 25%;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
+  }
+  
+  .right-column {
+    width: 75%;
+    padding-left: 20px;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  li.highlight {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+
+  ul li.selected {
+    color: red; /* Change the color as needed */
+    font-weight: bold; /* Optional: Makes the text bold */
+  }
+  
+  .box {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .create-event {
+    margin-top: 20px;
+  }
+  
+  .create-event form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .create-event label {
+    margin-bottom: 10px;
+  }
+  
+  .create-event input {
+    margin-bottom: 5px;
+  }
+  

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
 import './Garage.css';
 import { useCar } from '../context/CarContext';
 import { Menu, Item, contextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import EditableTable from '../components/EditableTable';
+
+Modal.setAppElement('#root'); // Set the app element for accessibility
 
 const Garage = () => {
   const { selectedCar: carId, carName } = useCar();
@@ -22,6 +25,8 @@ const Garage = () => {
   const [sessionTitle, setSessionTitle] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
   const [clickTimer, setClickTimer] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalCallback, setModalCallback] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -116,7 +121,8 @@ const Garage = () => {
   const loadEventsWithSessions = async () => {
     try {
       const fetchedEvents = await window.api.getEventsWithSessions();
-      const sortedEvents = fetchedEvents.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const filteredEvents = fetchedEvents.filter(event => event.carId == carId && event.trackId == 1);
+      const sortedEvents = filteredEvents.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setEvents(sortedEvents);
     } catch (error) {
       console.error('Error loading events with sessions:', error);
@@ -163,38 +169,53 @@ const Garage = () => {
 
       // Check for events in the last 24 hours
       let eventId;
-      if (events.length === 0) {
-        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
-        eventId = newEvent.id;
-      } else {
-        const recentEvents = await window.api.getEventsInLast24Hours();
-        if (recentEvents.length > 0) {
-          const recentEvent = recentEvents[0];
-          const useRecentEvent = confirm(`Would you like to add log entries to ${recentEvent.name} at ${recentEvent.date}? If not, a new event will be created.`);
-          if (useRecentEvent) {
+      const garageTrackId = 1; // ID of the "Garage" track
+
+      const recentEvents = await window.api.getEventsInLast24Hours();
+      const recentEvent = recentEvents.find(event => event.carId == carId && event.trackId == 1);
+      if (recentEvent) {
+        setIsModalOpen(true);
+        setModalCallback(() => async (option) => {
+          if (option === 'yes') {
             eventId = recentEvent.id;
-          } else {
-            const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
+          } else if (option === 'no') {
+            const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date(), garageTrackId, carId);
             eventId = newEvent.id;
           }
-        } else {
-          const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date());
-          eventId = newEvent.id;
-        }
+          if (eventId) {
+            // Fetch existing sessions for the event
+            const existingSessions = await window.api.getSessions(eventId);
+            const sessionCount = existingSessions.length;
+
+            // Add new session with the current title
+            const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
+
+            // Add session parts values
+            await window.api.addSessionPartsValue(newSession.id, values);
+
+            // Update session list
+            loadEventsWithSessions();
+          }
+        });
+      } else {
+        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date(), garageTrackId, carId);
+        eventId = newEvent.id;
       }
 
-      // Fetch existing sessions for the event
-      const existingSessions = await window.api.getSessions(eventId);
-      const sessionCount = existingSessions.length;
+      if (!isModalOpen && eventId) {
+        // Fetch existing sessions for the event
+        const existingSessions = await window.api.getSessions(eventId);
+        const sessionCount = existingSessions.length;
 
-      // Add new session with the current title
-      const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
+        // Add new session with the current title
+        const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
 
-      // Add session parts values
-      await window.api.addSessionPartsValue(newSession.id, values);
+        // Add session parts values
+        await window.api.addSessionPartsValue(newSession.id, values);
 
-      // Update session list
-      loadEventsWithSessions();
+        // Update session list
+        loadEventsWithSessions();
+      }
     } catch (error) {
       console.error('Error during submit:', error);
     }
@@ -310,6 +331,18 @@ const Garage = () => {
     ["Bottom Left", "Bottom Middle", "Bottom Right"],
   ];
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalCallback(null);
+  };
+
+  const handleModalOption = async (option) => {
+    closeModal();
+    if (modalCallback) {
+      await modalCallback(option)();
+    }
+  };
+
   return (
     <div className="garage">
       <div className="left-column">
@@ -378,7 +411,7 @@ const Garage = () => {
             autoFocus
           />
         ) : (
-          <h2 onDoubleClick={handleTitleDoubleClick} className="session-title">{sessionTitle}</h2>
+          <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
         )}
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <div className="parts-grid">
@@ -390,18 +423,17 @@ const Garage = () => {
                   <h4>{subheading}</h4>
                   <ul>
                     {groupedParts[location][subheading].map((part, index) => (
-                      <li key={part.id} className="part-input">
-                        <span className="part-name">{part.name}</span>
+                      <li key={part.id}>
+                        {part.name}
                         {part.entryType === 'text' && (
                           <input
                             type="text"
                             value={values[part.id] || ''}
                             onChange={(e) => handleChange(part.id, e.target.value)}
-                            className="center-input"
                           />
                         )}
                         {part.entryType === 'number' && (
-                          <div className="number-input center-input">
+                          <div className="number-input">
                             <button onClick={() => handleDecrement(part.id)}>-</button>
                             <input
                               type="number"
@@ -435,6 +467,19 @@ const Garage = () => {
           </div>
         </div>
       )}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Select Event Option"
+        className="modal"
+        overlayClassName="overlay"
+      >
+        <h2>Select Event Option</h2>
+        <p>Would you like to add log entries to the most recent event, create a new event, or cancel?</p>
+        <button onClick={() => handleModalOption('yes')}>Add to Last Event</button>
+        <button onClick={() => handleModalOption('no')}>Create New Event</button>
+        <button onClick={() => handleModalOption('cancel')}>Cancel</button>
+      </Modal>
       <Menu id="event-menu">
         <Item onClick={handleDeleteEvent}>Delete Event</Item>
       </Menu>

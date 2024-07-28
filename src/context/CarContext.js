@@ -11,22 +11,28 @@ export const CarProvider = ({ children }) => {
   const [selectedCar, setSelectedCar] = useState(localStorage.getItem('selectedCar') || '');
 
   useEffect(() => {
-    const fetchCars = async () => {
-      const fetchedCars = await window.api.getCars();
-      setCars(fetchedCars);
+    loadCars();
+  }, []);
 
-      // Set default car if none is selected
-      if (!selectedCar && fetchedCars.length > 0) {
-        setSelectedCar(fetchedCars[0].id);
-        localStorage.setItem('selectedCar', fetchedCars[0].id);
-      }
-    };
-
-    fetchCars();
+  useEffect(() => {
+    if (selectedCar) {
+      localStorage.setItem('selectedCar', selectedCar);
+    }
   }, [selectedCar]);
 
+  const loadCars = async () => {
+    const fetchedCars = await window.api.getCars();
+    setCars(fetchedCars);
+
+    // Set default car if none is selected
+    if (!selectedCar && fetchedCars.length > 0) {
+      setSelectedCar(fetchedCars[0].id);
+      localStorage.setItem('selectedCar', fetchedCars[0].id);
+    }
+  };
+
   return (
-    <CarContext.Provider value={{ cars, selectedCar, setSelectedCar }}>
+    <CarContext.Provider value={{ cars, setCars, selectedCar, setSelectedCar, loadCars }}>
       {children}
     </CarContext.Provider>
   );

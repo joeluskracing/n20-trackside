@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const { Sequelize, Op, Car, Part, Event, Session, PartsValues, SessionPartsValues } = require('./database');
+const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, PreSessionNotes, PostSessionNotes } = require('./database');
 
 contextBridge.exposeInMainWorld('api', {
   getCars: async () => {
@@ -22,7 +22,12 @@ contextBridge.exposeInMainWorld('api', {
     return await Event.findAll();
   },
   getSessions: async (eventId) => {
-    return await Session.findAll({ where: { eventId } });
+    try {
+      const sessions = await Session.findAll({ where: { eventId } });
+      return sessions.map(session => session.toJSON()); // Convert to plain JavaScript objects
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+    }
   },
   getPartsValues: async () => {
     try {
@@ -37,7 +42,8 @@ contextBridge.exposeInMainWorld('api', {
   },
   addCar: async (name) => {
     try {
-      return await Car.create({ name });
+      const car = await Car.create({ name });
+      return car.toJSON();
     } catch (error) {
       console.error('Error adding car:', error);
     }
@@ -63,9 +69,9 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error deleting part:', error);
     }
   },
-  addEvent: async (name, date) => {
+  addEvent: async (name, date, trackId, carId) => {
     try {
-      const event = await Event.create({ name, date });
+      const event = await Event.create({ name, date, trackId, carId });
       return event.toJSON(); // Return the full event object including its ID
     } catch (error) {
       console.error('Error adding event:', error);
@@ -191,4 +197,80 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error updating session name:', error);
     }
   },
+  getTracks: async () => {
+    try {
+      const tracks = await Track.findAll();
+      return tracks.map(track => track.toJSON());
+    } catch (error) {
+      console.error('Error fetching tracks:', error);
+    }
+  },
+  addTrack: async (name) => {
+    try {
+      const track = await Track.create({ name });
+      return track.toJSON();
+    } catch (error) {
+      console.error('Error adding track:', error);
+    }
+  },
+  getSession: async (sessionId) => {
+    try {
+      const session = await Session.findByPk(sessionId);
+      return session ? session.toJSON() : null;
+    } catch (error) {
+      console.error('Error fetching session:', error);
+    }
+  },
+  addPreSessionNotes: async (sessionId, notes) => {
+    try {
+      const preSessionNotes = await PreSessionNotes.create({ sessionId, notes });
+      return preSessionNotes.toJSON();
+    } catch (error) {
+      console.error('Error adding pre-session notes:', error);
+    }
+  },
+  addPostSessionNotes: async (sessionId, notes) => {
+    try {
+      const postSessionNotes = await PostSessionNotes.create({ sessionId, notes });
+      return postSessionNotes.toJSON();
+    } catch (error) {
+      console.error('Error adding post-session notes:', error);
+    }
+  },
+  getPreSessionNotesBySessionId: async (sessionId) => {
+    try {
+      const preSessionNotes = await PreSessionNotes.findOne({ where: { sessionId } });
+      return preSessionNotes ? preSessionNotes.toJSON() : null;
+    } catch (error) {
+      console.error('Error fetching pre-session notes:', error);
+    }
+  },
+  getPostSessionNotesBySessionId: async (sessionId) => {
+    try {
+      const postSessionNotes = await PostSessionNotes.findOne({ where: { sessionId } });
+      return postSessionNotes ? postSessionNotes.toJSON() : null;
+    } catch (error) {
+      console.error('Error fetching post-session notes:', error);
+    }
+  },
+  updatePreSessionNotes: async (sessionId, notes) => {
+    try {
+      await PreSessionNotes.update({ notes }, { where: { sessionId } });
+    } catch (error) {
+      console.error('Error updating pre-session notes:', error);
+    }
+  },
+  updatePostSessionNotes: async (sessionId, notes) => {
+    try {
+      await PostSessionNotes.update({ notes }, { where: { sessionId } });
+    } catch (error) {
+      console.error('Error updating post-session notes:', error);
+    }
+  },
+  deleteSessionPartsValuesBySessionId: async (sessionId) => {
+    const result = await db.SessionPartsValues.destroy({
+      where: { sessionId }
+    });
+    return result;
+  }
 });

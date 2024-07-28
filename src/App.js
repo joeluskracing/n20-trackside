@@ -10,9 +10,11 @@ import AddPart from './pages/AddPart';
 import ModifyParts from './pages/ModifyParts';
 import { CarProvider } from './context/CarContext'; // Import the CarProvider
 import './App.css';
+import { EventProvider } from './context/EventContext';
 
 const App = () => {
   return (
+    <EventProvider>
     <CarProvider>
       <Navbar />
       <Routes>
@@ -26,6 +28,7 @@ const App = () => {
         {/* Add more routes as needed */}
       </Routes>
     </CarProvider>
+    </EventProvider>
   );
 };
 
