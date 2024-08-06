@@ -1,3 +1,4 @@
+// Garage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -6,8 +7,19 @@ import { useCar } from '../context/CarContext';
 import { Menu, Item, contextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import EditableTable from '../components/EditableTable';
+import PartsGrid from '../components/PartsGrid';
+import '../components/PartsGrid.css';
+
 
 Modal.setAppElement('#root'); // Set the app element for accessibility
+
+const gridLayout = [
+  ["Top Left", "Top Middle", "Top Right"],
+  ["LF", "Engine", "RF"],
+  ["Driver", "Center", "Passenger"],
+  ["LR", "Differential", "RR"],
+  ["Bottom Left", "Bottom Middle", "Bottom Right"]
+];
 
 const Garage = () => {
   const { selectedCar: carId, carName } = useCar();
@@ -323,14 +335,6 @@ const Garage = () => {
     }
   };
 
-  const displayGrid = [
-    ["Top Left", "Top Middle", "Top Right"],
-    ["LF", "Engine", "RF"],
-    ["Driver", "Center", "Passenger"],
-    ["LR", "Differential", "RR"],
-    ["Bottom Left", "Bottom Middle", "Bottom Right"],
-  ];
-
   const closeModal = () => {
     setIsModalOpen(false);
     setModalCallback(null);
@@ -414,46 +418,17 @@ const Garage = () => {
           <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
         )}
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
-        <div className="parts-grid">
-          {displayGrid.flat().map((location) => (
-            <div key={location} className="grid-cell">
-              <h3>{location}</h3>
-              {groupedParts[location] && Object.keys(groupedParts[location]).map((subheading) => (
-                <div key={subheading}>
-                  <h4>{subheading}</h4>
-                  <ul>
-                    {groupedParts[location][subheading].map((part, index) => (
-                      <li key={part.id}>
-                        {part.name}
-                        {part.entryType === 'text' && (
-                          <input
-                            type="text"
-                            value={values[part.id] || ''}
-                            onChange={(e) => handleChange(part.id, e.target.value)}
-                          />
-                        )}
-                        {part.entryType === 'number' && (
-                          <div className="number-input">
-                            <button onClick={() => handleDecrement(part.id)}>-</button>
-                            <input
-                              type="number"
-                              value={values[part.id] || 0}
-                              onChange={(e) => handleChange(part.id, Number(e.target.value))}
-                            />
-                            <button onClick={() => handleIncrement(part.id)}>+</button>
-                          </div>
-                        )}
-                        {part.entryType === 'table' && (
-                          <button onClick={() => handleTableLinkClick(part)}>Table</button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        <PartsGrid
+          gridLayout={gridLayout}
+          groupedParts={groupedParts}
+          values={values}
+          handleChange={handleChange}
+          handleIncrement={handleIncrement}
+          handleDecrement={handleDecrement}
+          handleTableLinkClick={handleTableLinkClick}
+          showAll={true}
+          searchTerm={''}
+        />
       </div>
       {showTableLightbox && (
         <div className="lightbox">

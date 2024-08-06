@@ -7,6 +7,9 @@ import Modal from 'react-modal';
 import { Menu, Item, contextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import EditableTable from '../components/EditableTable';
+import PartsGrid from '../components/PartsGrid';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 Modal.setAppElement('#root'); // Set the app element for accessibility
 
@@ -102,11 +105,11 @@ const Trackside = () => {
       const fetchedParts = await window.api.getParts(carId);
       const partsValues = await window.api.getPartsValues() || [];
       const sessionPartsValues = await window.api.getSessionPartsValuesBySessionId(sessionId) || {};
-  
+
       const uniqueParts = ensureUniqueOrder(fetchedParts);
       const sortedParts = uniqueParts.sort((a, b) => a.order - b.order);
       setParts(sortedParts);
-  
+
       const initialValues = {};
       for (const part of sortedParts) {
         const sessionPartValue = sessionPartsValues.values ? sessionPartsValues.values[part.id] : undefined;
@@ -114,7 +117,7 @@ const Trackside = () => {
         initialValues[part.id] = sessionPartValue !== undefined ? sessionPartValue : (partValue ? partValue.value : '');
       }
       setValues(initialValues);
-  
+
       groupPartsByLocation(sortedParts);
     } catch (error) {
       console.error('Error loading parts:', error);
@@ -335,25 +338,29 @@ const Trackside = () => {
       for (const partId in values) {
         await window.api.updatePartValue(partId, values[partId]);
       }
-
+  
       // Check for existing session parts values
       const existingSessionPartsValues = await window.api.getSessionPartsValuesBySessionId(currentSession) || {};
       if (Object.keys(existingSessionPartsValues).length > 0) {
         await window.api.deleteSessionPartsValuesBySessionId(currentSession);
       }
-
+  
       // Add new session parts values
       await window.api.addSessionPartsValue2(currentSession, values);
-
+  
       // Save notes
       await window.api.updatePreSessionNotes(currentSession, preSessionNotes);
       await window.api.updatePostSessionNotes(currentSession, postSessionNotes);
-
+  
       // Refresh the sessions to ensure data is up-to-date but preserve current session
       await loadSessions(currentEvent.id);
       setCurrentSession(currentSession); // Ensure the selected session remains highlighted
+  
+      // Show success toast with session and event details
+      toast.success(`Parts values for ${sessions.find(s => s.id === currentSession)?.name || 'session'} updated for ${currentEvent.name}`);
     } catch (error) {
       console.error('Error during setup submit:', error);
+      toast.error('Failed to update parts values.');
     }
   };
 
@@ -408,6 +415,7 @@ const Trackside = () => {
 
   return (
     <div className="trackside">
+      <ToastContainer />
       {currentEvent ? (
         <div className="dashboard">
           <div className="left-column">
@@ -452,52 +460,17 @@ const Trackside = () => {
                   Hide All
                 </button>
               </div>
-              <div className="parts-grid2">
-                {gridLayout.map((row, rowIndex) => (
-                  <div key={rowIndex} className="grid-row">
-                    {row.map((location) => (
-                      <div key={location} className="grid-cell">
-                        <h3>{location}</h3>
-                        {Object.keys(groupedParts[location] || {}).map(subheading => (
-                          <div key={subheading}>
-                            <h4>{subheading}</h4>
-                            <ul>
-                              {(groupedParts[location][subheading] || [])
-                                .filter(part => showAll || part.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                                .map((part, index) => (
-                                  <li key={part.id}>
-                                    {part.name}
-                                    {part.entryType == 'text' && (
-                                      <input
-                                        type="text"
-                                        value={values[part.id] || ''}
-                                        onChange={(e) => handleChange(part.id, e.target.value)}
-                                      />
-                                    )}
-                                    {part.entryType == 'number' && (
-                                      <div className="number-input">
-                                        <button onClick={() => handleDecrement(part.id)}>-</button>
-                                        <input
-                                          type="number"
-                                          value={values[part.id] || 0}
-                                          onChange={(e) => handleChange(part.id, Number(e.target.value))}
-                                        />
-                                        <button onClick={() => handleIncrement(part.id)}>+</button>
-                                      </div>
-                                    )}
-                                    {part.entryType == 'table' && (
-                                      <button onClick={() => handleTableLinkClick(part)}>Table</button>
-                                    )}
-                                  </li>
-                                ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
+              <PartsGrid
+                gridLayout={gridLayout}
+                groupedParts={groupedParts}
+                values={values}
+                handleChange={handleChange}
+                handleIncrement={handleIncrement}
+                handleDecrement={handleDecrement}
+                handleTableLinkClick={handleTableLinkClick}
+                showAll={showAll}
+                searchTerm={searchTerm}
+              />
             </div>
             <div className="box">
               <h2>Post-Session Notes</h2>
@@ -521,7 +494,7 @@ const Trackside = () => {
             <p>No trackside events available. Create a new event.</p>
           )}
           <button onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
-          
+
           {showForm && (
             <div className="create-event">
               <h2>Create Event</h2>
@@ -608,9 +581,9 @@ const Trackside = () => {
         <div className="lightbox">
           <div className="lightbox-content">
             <h2>{currentPart.name} Table</h2>
-            <EditableTable 
-              value={values[currentPart.id]} 
-              onChange={(newValue) => handleChange(currentPart.id, newValue)} 
+            <EditableTable
+              value={values[currentPart.id]}
+              onChange={(newValue) => handleChange(currentPart.id, newValue)}
             />
             <button onClick={handleTableLightboxClose}>Close</button>
           </div>

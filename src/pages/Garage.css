@@ -15,23 +15,6 @@
   align-items: center;
 }
 
-.parts-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  width: 100%;
-}
-
-.grid-cell {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  flex: 1 1 calc(33.333% - 1rem);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .part-input {
   display: flex;
   justify-content: center;
@@ -81,22 +64,6 @@ button {
 button:hover {
   background: #0056b3;
 }
-
-.number-input {
-  display: flex;
-  align-items: center;
-}
-
-.number-input button {
-  padding: 0.3rem 0.6rem;
-  font-size: 1rem;
-}
-
-.number-input input {
-  width: 3rem;
-  text-align: center;
-}
-
 .context-menu {
   position: absolute;
   z-index: 1000;

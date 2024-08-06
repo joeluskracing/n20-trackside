@@ -100,34 +100,6 @@ ul li.selected {
   font-weight: bold;
 }
 
-.parts-grid2 {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.grid-row {
-  display: flex;
-  width: 100%;
-}
-
-.grid-cell {
-  display:flex;
-  flex: 1 0 33%;
-  box-sizing: border-box;
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-}
-
-.number-input {
-  display: flex;
-  align-items: center;
-}
-
-.number-input button {
-  margin: 0 5px;
-}
-
 .save-notes {
   margin-top: 20px;
 }
