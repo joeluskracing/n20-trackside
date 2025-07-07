@@ -300,34 +300,7 @@ contextBridge.exposeInMainWorld('api', {
   },
   exportCarData: async (carId) => {
     try {
-      const car = await Car.findByPk(carId, {
-        include: [
-          { model: Part, include: [PartsValues] },
-          {
-            model: Event,
-            include: [
-              { model: Track },
-              {
-                model: Session,
-                as: 'Sessions',
-                include: [SessionPartsValues, PreSessionNotes, PostSessionNotes]
-              }
-            ]
-          }
-        ]
-      });
-      if (!car) return null;
-      const homeDir = require('os').homedir();
-      const exportsDir = path.join(homeDir, 'n20-trackside', 'exports');
-      if (!fs.existsSync(exportsDir)) {
-        fs.mkdirSync(exportsDir, { recursive: true });
-      }
-      const filePath = path.join(
-        exportsDir,
-        `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`
-      );
-      fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
-      return filePath;
+      return await ipcRenderer.invoke('export-car-data', carId);
     } catch (error) {
       console.error('Error exporting car data:', error);
       throw error;
