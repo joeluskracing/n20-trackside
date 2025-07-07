@@ -317,14 +317,9 @@ contextBridge.exposeInMainWorld('api', {
         ]
       });
       if (!car) return null;
-      const exportsDir = path.join(__dirname, 'exports');
-      if (!fs.existsSync(exportsDir)) {
-        fs.mkdirSync(exportsDir);
-      }
-      const filePath = path.join(
-        exportsDir,
-        `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`
-      );
+      const defaultFile = `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`;
+      const filePath = await ipcRenderer.invoke('show-save-dialog', defaultFile);
+      if (!filePath) return null;
       fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
       return filePath;
     } catch (error) {
