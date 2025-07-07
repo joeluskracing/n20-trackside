@@ -317,9 +317,10 @@ contextBridge.exposeInMainWorld('api', {
         ]
       });
       if (!car) return null;
-      const exportsDir = path.join(__dirname, 'exports');
+      const homeDir = require('os').homedir();
+      const exportsDir = path.join(homeDir, 'n20-trackside', 'exports');
       if (!fs.existsSync(exportsDir)) {
-        fs.mkdirSync(exportsDir);
+        fs.mkdirSync(exportsDir, { recursive: true });
       }
       const filePath = path.join(
         exportsDir,
