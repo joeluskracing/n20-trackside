@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
@@ -6,6 +6,7 @@ import { useCar } from '../context/CarContext';
 const Home = () => {
   const { cars, selectedCar, setSelectedCar, loadCars } = useCar();
   const [parts, setParts] = useState([]);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,6 +53,33 @@ const Home = () => {
     }
   };
 
+  const handleExportCar = async () => {
+    if (!selectedCar) return;
+    try {
+      const filePath = await window.api.exportCarData(selectedCar);
+      alert(`Car exported to ${filePath}`);
+    } catch (error) {
+      console.error('Error exporting car:', error);
+    }
+  };
+
+  const handleImportButton = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        await window.api.importCarData(file.path);
+        loadCars();
+        alert('Car imported successfully');
+      } catch (error) {
+        console.error('Error importing car:', error);
+      }
+    }
+  };
+
   return (
     <div className="home-grid">
       <div className="grid-box">
@@ -63,17 +91,26 @@ const Home = () => {
           </div>
         ) : (
           <div>
-            <select value={selectedCar || ''} onChange={handleCarChange}>
-              <option value="">Select a car</option>
-              {cars.map((car) => (
-                <option key={car.id} value={car.id}>
-                  {car.name}
-                </option>
-              ))}
-            </select>
-            <button onClick={handleCreateCar}>Add another car</button>
-          </div>
-        )}
+          <select value={selectedCar || ''} onChange={handleCarChange}>
+            <option value="">Select a car</option>
+            {cars.map((car) => (
+              <option key={car.id} value={car.id}>
+                {car.name}
+              </option>
+            ))}
+          </select>
+          <button onClick={handleCreateCar}>Add another car</button>
+          <button onClick={handleExportCar} disabled={!selectedCar}>Export Car</button>
+          <button onClick={handleImportButton}>Import Car</button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".json"
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
       </div>
       <div className="grid-box">
         <h2>Parts List</h2>
