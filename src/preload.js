@@ -317,15 +317,12 @@ contextBridge.exposeInMainWorld('api', {
         ]
       });
       if (!car) return null;
-      const homeDir = require('os').homedir();
-      const exportsDir = path.join(homeDir, 'n20-trackside', 'exports');
-      if (!fs.existsSync(exportsDir)) {
-        fs.mkdirSync(exportsDir, { recursive: true });
+      const defaultName = `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`;
+      const filePath = await ipcRenderer.invoke('show-save-dialog', defaultName);
+      if (!filePath) {
+        console.log('Export canceled by user');
+        return null;
       }
-      const filePath = path.join(
-        exportsDir,
-        `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`
-      );
       fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
       return filePath;
     } catch (error) {
