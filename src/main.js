@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain  } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const { Part } = require('./database');
 
@@ -17,6 +17,14 @@ function createWindow() {
 }
 
 app.on('ready', createWindow);
+
+ipcMain.handle('show-save-dialog', async (event, defaultFileName) => {
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    defaultPath: path.join(app.getPath('documents'), defaultFileName),
+    filters: [{ name: 'JSON Files', extensions: ['json'] }]
+  });
+  return canceled ? null : filePath;
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

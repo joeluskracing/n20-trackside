@@ -54,10 +54,16 @@ const Home = () => {
   };
 
   const handleExportCar = async () => {
+    console.log('Export button clicked');
     if (!selectedCar) return;
     try {
       const filePath = await window.api.exportCarData(selectedCar);
-      alert(`Car exported to ${filePath}`);
+      console.log('Exported file path:', filePath);
+      if (filePath) {
+        alert(`Car exported to ${filePath}`);
+      } else {
+        alert('Export cancelled');
+      }
     } catch (error) {
       console.error('Error exporting car:', error);
     }
