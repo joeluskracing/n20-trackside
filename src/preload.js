@@ -1,5 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, PreSessionNotes, PostSessionNotes } = require('./database');
+const fs = require('fs');
+const path = require('path');
 
 contextBridge.exposeInMainWorld('api', {
   getCars: async () => {
@@ -294,6 +296,97 @@ contextBridge.exposeInMainWorld('api', {
       await SessionPartsValues.destroy({ where: { sessionId } });
     } catch (error) {
       console.error('Error deleting session parts values:', error);
+    }
+  },
+  exportCarData: async (carId) => {
+    try {
+      const car = await Car.findByPk(carId, {
+        include: [
+          { model: Part, include: [PartsValues] },
+          {
+            model: Event,
+            include: [
+              { model: Track },
+              {
+                model: Session,
+                as: 'Sessions',
+                include: [SessionPartsValues, PreSessionNotes, PostSessionNotes]
+              }
+            ]
+          }
+        ]
+      });
+      if (!car) return null;
+      const defaultFile = `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`;
+      const filePath = await ipcRenderer.invoke('show-save-dialog', defaultFile);
+      if (!filePath) return null;
+      fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
+      return filePath;
+    } catch (error) {
+      console.error('Error exporting car data:', error);
+      throw error;
+    }
+  },
+  importCarData: async (filePath) => {
+    try {
+      const data = JSON.parse(fs.readFileSync(filePath));
+      const newCar = await Car.create({ name: data.name });
+
+      const partIdMap = {};
+      if (data.Parts) {
+        for (const part of data.Parts) {
+          const { id, PartsValues: pv = [], ...partData } = part;
+          const newPart = await Part.create({ ...partData, carId: newCar.id });
+          partIdMap[id] = newPart.id;
+          if (pv.length > 0) {
+            await PartsValues.create({ partId: newPart.id, value: pv[0].value });
+          }
+        }
+      }
+
+      if (data.Events) {
+        for (const event of data.Events) {
+          let trackId = 1;
+          if (event.Track) {
+            let track = await Track.findOne({ where: { name: event.Track.name } });
+            if (!track) {
+              track = await Track.create({ name: event.Track.name });
+            }
+            trackId = track.id;
+          }
+          const newEvent = await Event.create({
+            name: event.name,
+            date: event.date,
+            trackId,
+            carId: newCar.id
+          });
+          for (const session of event.Sessions || []) {
+            const { SessionPartsValues: spv = [], PreSessionNotes: pre = [], PostSessionNotes: post = [], ...sessData } = session;
+            const newSession = await Session.create({ ...sessData, eventId: newEvent.id });
+
+            if (spv.length > 0) {
+              const values = {};
+              for (const [oldId, val] of Object.entries(spv[0].values || {})) {
+                if (partIdMap[oldId]) values[partIdMap[oldId]] = val;
+              }
+              await SessionPartsValues.create({ sessionId: newSession.id, values });
+            }
+
+            if (pre.length > 0) {
+              await PreSessionNotes.create({ sessionId: newSession.id, notes: pre[0].notes });
+            }
+
+            if (post.length > 0) {
+              await PostSessionNotes.create({ sessionId: newSession.id, notes: post[0].notes });
+            }
+          }
+        }
+      }
+
+      return newCar.toJSON();
+    } catch (error) {
+      console.error('Error importing car data:', error);
+      throw error;
     }
   }
 });
