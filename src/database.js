@@ -139,6 +139,11 @@ const Session = sequelize.define('Session', {
   type: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  lastSelected: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
   timestamps: true
