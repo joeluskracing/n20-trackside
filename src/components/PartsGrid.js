@@ -18,46 +18,80 @@ const PartsGrid = ({
     <div className="parts-grid">
       {gridLayout.map((row, rowIndex) => (
         <div key={rowIndex} className="grid-row">
-          {row.map((location) => (
-            <div key={location} className="grid-cell">
-              <h3>{location}</h3>
-              {Object.keys(groupedParts[location] || {}).map(subheading => (
-                <div key={subheading}>
-                  <h4>{subheading}</h4>
-                  <ul>
-                    {(groupedParts[location][subheading] || [])
-                      .filter(part => showAll || part.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                      .map((part) => (
-                        <li key={part.id}>
-                          {part.name}
-                          {part.entryType === 'text' && (
-                            <input
-                              type="text"
-                              value={values[part.id] || ''}
-                              onChange={(e) => handleChange(part.id, e.target.value)}
-                            />
-                          )}
-                          {part.entryType === 'number' && (
-                            <div className="number-input">
-                              <button onClick={() => handleDecrement(part.id)}>-</button>
+          {row.map((location) => {
+            const hasParts =
+              groupedParts[location] &&
+              Object.values(groupedParts[location]).some(
+                (arr) => Array.isArray(arr) && arr.length > 0
+              );
+
+            if (!hasParts) {
+              return <div key={location} className="grid-cell placeholder" />;
+            }
+
+            return (
+              <div key={location} className="grid-cell">
+                <h3>{location}</h3>
+                {Object.keys(groupedParts[location] || {}).map((subheading) => (
+                  <div key={subheading}>
+                    <h4>{subheading}</h4>
+                    <ul>
+                      {(groupedParts[location][subheading] || [])
+                        .filter(
+                          (part) =>
+                            showAll ||
+                            part.name
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                        )
+                        .map((part) => (
+                          <li key={part.id}>
+                            {part.name}
+                            {part.entryType === 'text' && (
                               <input
-                                type="number"
-                                value={values[part.id] || 0}
-                                onChange={(e) => handleChange(part.id, Number(e.target.value))}
+                                type="text"
+                                value={values[part.id] || ''}
+                                onChange={(e) =>
+                                  handleChange(part.id, e.target.value)
+                                }
                               />
-                              <button onClick={() => handleIncrement(part.id)}>+</button>
-                            </div>
-                          )}
-                          {part.entryType === 'table' && (
-                            <button onClick={() => handleTableLinkClick(part)}>Table</button>
-                          )}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          ))}
+                            )}
+                            {part.entryType === 'number' && (
+                              <div className="number-input">
+                                <button
+                                  onClick={() => handleDecrement(part.id)}
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  value={values[part.id] || 0}
+                                  onChange={(e) =>
+                                    handleChange(part.id, Number(e.target.value))
+                                  }
+                                />
+                                <button
+                                  onClick={() => handleIncrement(part.id)}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            )}
+                            {part.entryType === 'table' && (
+                              <button
+                                onClick={() => handleTableLinkClick(part)}
+                              >
+                                Table
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       ))}
     </div>
