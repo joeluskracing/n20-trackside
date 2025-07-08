@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const {
@@ -53,6 +53,7 @@ ipcMain.handle('export-car-data', async (event, carId) => {
             {
               model: Session,
               as: 'Sessions',
+              attributes: { exclude: ['lastSelected'] },
               include: [SessionPartsValues, PreSessionNotes, PostSessionNotes]
             }
           ]
@@ -72,6 +73,8 @@ ipcMain.handle('export-car-data', async (event, carId) => {
     }
 
     fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
+    // Open the exported file in the user's file explorer
+    shell.showItemInFolder(filePath);
     return filePath;
   } catch (error) {
     console.error('Error exporting car data:', error);
