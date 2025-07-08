@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Garage from './pages/Garage';
 import Trackside from './pages/Trackside';
+import Checklist from './pages/Checklist';
 import Settings from './pages/Settings';
 import CreateCar from './pages/CreateCar';
 import AddPart from './pages/AddPart';
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/garage" element={<Garage />} />
         <Route path="/trackside" element={<Trackside />} />
+        <Route path="/checklist" element={<Checklist />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/create-car" element={<CreateCar />} />
         <Route path="/add-part" element={<AddPart />} />
