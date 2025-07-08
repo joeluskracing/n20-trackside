@@ -9,6 +9,7 @@ import Settings from './pages/Settings';
 import CreateCar from './pages/CreateCar';
 import AddPart from './pages/AddPart';
 import ModifyParts from './pages/ModifyParts';
+import ManageParts from './pages/ManageParts';
 import { CarProvider } from './context/CarContext'; // Import the CarProvider
 import './App.css';
 import { EventProvider } from './context/EventContext';
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/create-car" element={<CreateCar />} />
         <Route path="/add-part" element={<AddPart />} />
         <Route path="/modify-parts" element={<ModifyParts />} />
+        <Route path="/manage-parts" element={<ManageParts />} />
         {/* Add more routes as needed */}
       </Routes>
     </CarProvider>
