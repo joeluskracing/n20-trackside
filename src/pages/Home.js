@@ -39,7 +39,7 @@ const Home = () => {
     const selectedCarObj = cars.find(car => car.id == selectedCar);
     if (selectedCarObj) {
       console.log("Navigating to Add Part with:", { carId: selectedCarObj.id, carName: selectedCarObj.name });
-      navigate('/add-part', { state: { carId: selectedCarObj.id, carName: selectedCarObj.name } }); // Navigate to add part form
+      navigate('/manage-parts', { state: { carId: selectedCarObj.id, carName: selectedCarObj.name } });
     } else {
       console.error("Selected car not found in the fetched cars.");
     }
@@ -49,7 +49,7 @@ const Home = () => {
     const selectedCarObj = cars.find(car => car.id == selectedCar);
     if (selectedCarObj) {
       console.log("Navigating to Modify Parts with:", { carId: selectedCarObj.id, carName: selectedCarObj.name });
-      navigate('/modify-parts', { state: { carId: selectedCarObj.id, carName: selectedCarObj.name } }); // Navigate to modify parts form
+      navigate('/manage-parts', { state: { carId: selectedCarObj.id, carName: selectedCarObj.name } });
     } else {
       console.error("Selected car not found in the fetched cars.");
     }

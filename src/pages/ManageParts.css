@@ -1,0 +1,19 @@
+.manage-parts {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.form-panel {
+  width: 320px;
+}
+
+.grid-panel {
+  flex: 1;
+  position: relative;
+}
+
+.drag-handle {
+  cursor: move;
+  margin-right: 8px;
+}
