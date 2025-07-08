@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes, CarTemplate } = require('./database');
+const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes, ChecklistNote, CarTemplate} = require('./database');
 const fs = require('fs');
 const path = require('path');
 
@@ -451,6 +451,37 @@ contextBridge.exposeInMainWorld('api', {
     } catch (error) {
       console.error('Error calculating stats:', error);
       return {};
+    }
+  },
+  getChecklistNotes: async () => {
+    try {
+      const notes = await ChecklistNote.findAll({ order: [['createdAt', 'DESC']] });
+      return notes.map(n => n.toJSON());
+    } catch (error) {
+      console.error('Error fetching checklist notes:', error);
+      return [];
+    }
+  },
+  addChecklistNote: async (title, content) => {
+    try {
+      const note = await ChecklistNote.create({ title, content });
+      return note.toJSON();
+    } catch (error) {
+      console.error('Error adding checklist note:', error);
+    }
+  },
+  updateChecklistNote: async (id, title, content) => {
+    try {
+      await ChecklistNote.update({ title, content }, { where: { id } });
+    } catch (error) {
+      console.error('Error updating checklist note:', error);
+    }
+  },
+  deleteChecklistNote: async (id) => {
+    try {
+      await ChecklistNote.destroy({ where: { id } });
+    } catch (error) {
+      console.error('Error deleting checklist note:', error);
     }
   },
   exportCarData: async (carId) => {

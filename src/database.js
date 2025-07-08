@@ -255,6 +255,24 @@ const PostSessionNotes = sequelize.define('PostSessionNotes', {
   }
 });
 
+const ChecklistNote = sequelize.define('ChecklistNote', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  }
+}, {
+  timestamps: true
+});
+
 // Define relationships
 Car.hasMany(Part, { foreignKey: 'carId', onDelete: 'CASCADE' });
 Part.belongsTo(Car, { foreignKey: 'carId', onDelete: 'CASCADE' });
@@ -345,5 +363,6 @@ module.exports = {
   PreSessionNotes,
   PostSessionNotes,
   CarTemplate,
+  ChecklistNote,
   Op
 };
