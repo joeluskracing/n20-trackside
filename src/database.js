@@ -114,6 +114,32 @@ const Event = sequelize.define('Event', {
   timestamps: true
 });
 
+const EventInfo = sequelize.define('EventInfo', {
+  eventId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Event,
+      key: 'id'
+    },
+    onDelete: 'CASCADE',
+    primaryKey: true
+  },
+  temperature: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  humidity: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  notes: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  }
+}, {
+  timestamps: true
+});
+
 const Session = sequelize.define('Session', {
   id: {
     type: DataTypes.INTEGER,
@@ -298,6 +324,9 @@ PreSessionNotes.belongsTo(Session, { foreignKey: 'sessionId', onDelete: 'CASCADE
 Session.hasMany(PostSessionNotes, { foreignKey: 'sessionId', onDelete: 'CASCADE' });
 PostSessionNotes.belongsTo(Session, { foreignKey: 'sessionId', onDelete: 'CASCADE' });
 
+Event.hasOne(EventInfo, { foreignKey: 'eventId', onDelete: 'CASCADE' });
+EventInfo.belongsTo(Event, { foreignKey: 'eventId', onDelete: 'CASCADE' });
+
 // Sync database and prepopulate with the "Garage" track
 sequelize.sync({ force: false }).then(async () => {  // Do not use force: true in production as it drops and recreates the tables
   console.log("Database & tables synchronized!");
@@ -362,6 +391,7 @@ module.exports = {
   NotesTemplate,
   PreSessionNotes,
   PostSessionNotes,
+  EventInfo,
   CarTemplate,
   ChecklistNote,
   Op

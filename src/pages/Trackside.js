@@ -48,6 +48,11 @@ const Trackside = () => {
   const [modalCallback, setModalCallback] = useState(null);
   const [preTemplate, setPreTemplate] = useState([]);
   const [postTemplate, setPostTemplate] = useState([]);
+  const [eventInfo, setEventInfo] = useState({ temperature: '', humidity: '', notes: '' });
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [editTrack, setEditTrack] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editDate, setEditDate] = useState('');
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -71,6 +76,9 @@ const Trackside = () => {
     if (currentEvent) {
       loadSessions(currentEvent.id);
       setShowForm(false);
+      window.api.getEventInfo(currentEvent.id).then(info => {
+        if (info) setEventInfo(info);
+      });
     }
   }, [currentEvent]);
 
@@ -415,6 +423,31 @@ const Trackside = () => {
     setShowAll(false);
   };
 
+  const startEditInfo = () => {
+    if (!currentEvent) return;
+    setEditTrack(tracks.find(t => t.id === currentEvent.trackId)?.name || '');
+    setEditName(currentEvent.name);
+    setEditDate(new Date(currentEvent.date).toISOString().split('T')[0]);
+    setIsEditingInfo(true);
+  };
+
+  const saveEventInfo = async () => {
+    if (!currentEvent) return;
+    let trackId = tracks.find(t => t.name === editTrack)?.id;
+    if (!trackId) {
+      const newTrack = await window.api.addTrack(editTrack);
+      trackId = newTrack.id;
+    }
+    await window.api.updateEvent(currentEvent.id, { name: editName, date: new Date(editDate), trackId });
+    await window.api.updateEventInfo(currentEvent.id, eventInfo.temperature, eventInfo.humidity, eventInfo.notes);
+    setCurrentEvent({ ...currentEvent, name: editName, date: new Date(editDate).toISOString(), trackId });
+    setIsEditingInfo(false);
+  };
+
+  const cancelEditInfo = () => {
+    setIsEditingInfo(false);
+  };
+
   return (
     <div className="trackside">
       <ToastContainer />
@@ -434,6 +467,53 @@ const Trackside = () => {
                 </li>
               ))}
             </ul>
+            <div className="event-info box">
+              {isEditingInfo ? (
+                <>
+                  <label>
+                    Track:
+                    <input type="text" list="track-options" value={editTrack} onChange={(e) => setEditTrack(e.target.value)} />
+                    <datalist id="track-options">
+                      {tracks.map((track, index) => (
+                        <option key={index} value={track.name} />
+                      ))}
+                    </datalist>
+                  </label>
+                  <label>
+                    Event Name:
+                    <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                  </label>
+                  <label>
+                    Event Date:
+                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
+                  </label>
+                  <label>
+                    Temperature:
+                    <input type="text" value={eventInfo.temperature || ''} onChange={(e) => setEventInfo({ ...eventInfo, temperature: e.target.value })} />
+                  </label>
+                  <label>
+                    Humidity:
+                    <input type="text" value={eventInfo.humidity || ''} onChange={(e) => setEventInfo({ ...eventInfo, humidity: e.target.value })} />
+                  </label>
+                  <label>
+                    Notes:
+                    <textarea value={eventInfo.notes || ''} onChange={(e) => setEventInfo({ ...eventInfo, notes: e.target.value })} />
+                  </label>
+                  <button onClick={saveEventInfo}>💾</button>
+                  <button onClick={cancelEditInfo}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <div className="info-row"><strong>Track:</strong> {tracks.find(t => t.id === currentEvent.trackId)?.name}</div>
+                  <div className="info-row"><strong>Event:</strong> {currentEvent.name}</div>
+                  <div className="info-row"><strong>Date:</strong> {new Date(currentEvent.date).toISOString().split('T')[0]}</div>
+                  <div className="info-row"><strong>Temp:</strong> {eventInfo.temperature || ''}</div>
+                  <div className="info-row"><strong>Humidity:</strong> {eventInfo.humidity || ''}</div>
+                  <div className="info-row"><strong>Notes:</strong> {eventInfo.notes || ''}</div>
+                  <button className="edit-info" onClick={startEditInfo}>✏️</button>
+                </>
+              )}
+            </div>
             <button className="end-event" onClick={handleEndEvent}>End Event</button>
           </div>
           <div className="right-column">
