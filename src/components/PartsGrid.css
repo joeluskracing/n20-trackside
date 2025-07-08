@@ -43,9 +43,7 @@
 }
 
 .grid-cell.placeholder {
-  visibility: hidden;
-  border: 1px solid transparent;
-  padding: 10px;
+  display: none;
 }
   
   .number-input {
