@@ -101,7 +101,9 @@ const ManageParts = () => {
     setDraggedPart(part);
   };
 
-  const handleDropOnPart = (targetPart) => {
+  const handleDropOnPart = (e, targetPart) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!draggedPart || draggedPart.id === targetPart.id) return;
 
     const sameContainer =
@@ -135,9 +137,15 @@ const ManageParts = () => {
     setDraggedPart(null);
   };
 
-  const handleDropOnContainer = (location, sub) => {
+  const handleDropOnContainer = (e, location, sub) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!draggedPart) return;
-    const updated = parts.map(p => p.id === draggedPart.id ? { ...p, displayLocation: location, subheading: sub } : p);
+    const updated = parts.map(p =>
+      p.id === draggedPart.id
+        ? { ...p, displayLocation: location, subheading: sub }
+        : p
+    );
     setParts(reorderParts(updated));
     setDraggedPart(null);
   };
@@ -222,10 +230,19 @@ const ManageParts = () => {
           {gridLayout.map((row,rowIndex) => (
             <div key={rowIndex} className="grid-row">
               {row.map(location => (
-                <div key={location} className="grid-cell" onDragOver={e => e.preventDefault()} onDrop={() => handleDropOnContainer(location,'Others')}>
+                <div
+                  key={location}
+                  className="grid-cell"
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => handleDropOnContainer(e, location, 'Others')}
+                >
                   <h3>{location}</h3>
                   {groupedParts[location] && Object.keys(groupedParts[location]).map(sub => (
-                    <div key={sub} onDragOver={e => e.preventDefault()} onDrop={() => handleDropOnContainer(location, sub)}>
+                    <div
+                      key={sub}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={e => handleDropOnContainer(e, location, sub)}
+                    >
                       {editingSub && editingSub.loc===location && editingSub.sub===sub ? (
                         <input value={subEditValue} onChange={e => setSubEditValue(e.target.value)} onBlur={commitEditSub} onKeyDown={e => e.key==='Enter' && commitEditSub()} />
                       ) : (
@@ -233,7 +250,14 @@ const ManageParts = () => {
                       )}
                       <ul>
                         {groupedParts[location][sub].sort((a,b)=>a.order-b.order).map(part => (
-                          <li key={part.id} className="part-item" draggable onDragStart={() => handleDragStart(part)} onDrop={() => handleDropOnPart(part)} onDragOver={e => e.preventDefault()}>
+                          <li
+                            key={part.id}
+                            className="part-item"
+                            draggable
+                            onDragStart={() => handleDragStart(part)}
+                            onDrop={e => handleDropOnPart(e, part)}
+                            onDragOver={e => e.preventDefault()}
+                          >
                             <span className="drag-handle">::</span> {part.name}
                             <button onClick={() => handleDeletePart(part)}>X</button>
                           </li>
