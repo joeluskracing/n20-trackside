@@ -9,6 +9,8 @@ import 'react-contexify/dist/ReactContexify.css';
 import EditableTable from '../components/EditableTable';
 import PartsGrid from '../components/PartsGrid';
 import '../components/PartsGrid.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 Modal.setAppElement('#root'); // Set the app element for accessibility
@@ -33,6 +35,7 @@ const Garage = () => {
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [editingEventId, setEditingEventId] = useState(null);
   const [editingSessionId, setEditingSessionId] = useState(null);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
   const [editingName, setEditingName] = useState('');
   const [sessionTitle, setSessionTitle] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
@@ -197,18 +200,14 @@ const Garage = () => {
             eventId = newEvent.id;
           }
           if (eventId) {
-            // Fetch existing sessions for the event
             const existingSessions = await window.api.getSessions(eventId);
             const sessionCount = existingSessions.length;
-
-            // Add new session with the current title
             const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
-
-            // Add session parts values
             await window.api.addSessionPartsValue(newSession.id, values);
-
-            // Update session list
             loadEventsWithSessions();
+            setCurrentSessionId(newSession.id);
+            setSelectedEventId(eventId);
+            toast.success('Setup saved');
           }
         });
       } else {
@@ -217,18 +216,14 @@ const Garage = () => {
       }
 
       if (!isModalOpen && eventId) {
-        // Fetch existing sessions for the event
         const existingSessions = await window.api.getSessions(eventId);
         const sessionCount = existingSessions.length;
-
-        // Add new session with the current title
         const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
-
-        // Add session parts values
         await window.api.addSessionPartsValue(newSession.id, values);
-
-        // Update session list
         loadEventsWithSessions();
+        setCurrentSessionId(newSession.id);
+        setSelectedEventId(eventId);
+        toast.success('Setup saved');
       }
     } catch (error) {
       console.error('Error during submit:', error);
@@ -255,6 +250,7 @@ const Garage = () => {
       if (sessionPartsValues) {
         setValues(sessionPartsValues.values);
         setSessionTitle(session.name);
+        setCurrentSessionId(session.id);
       }
     }
   };
@@ -355,6 +351,7 @@ const Garage = () => {
 
   return (
     <div className="garage">
+      <ToastContainer />
       <div className="left-column">
         <h2>Garage Mode</h2>
         <p className="tip">Right click a session to delete it.</p>
@@ -372,7 +369,7 @@ const Garage = () => {
                 />
               ) : (
                 <button
-                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
+                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''} ${event.Sessions.some(s => s.id === currentSessionId) ? 'selected' : ''}`}
                   onClick={() => handleEventClick(event.id)}
                   onDoubleClick={() => handleEventDoubleClick(event)}
                   onContextMenu={(e) => handleContextMenu(e, event, 'event')}
@@ -386,7 +383,7 @@ const Garage = () => {
                     event.Sessions.map((session, index) => (
                       <li
                         key={index}
-                        className="session-item"
+                        className={`session-item ${currentSessionId === session.id ? 'selected' : ''}`}
                         onDoubleClick={() => handleSessionDoubleClick(session)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
@@ -432,7 +429,7 @@ const Garage = () => {
           <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
         )}
         <p className="tip">Double click the title to edit.</p>
-        <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
+        <button className="submit-button" onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <div className="search-controls">
           <input
             type="text"
