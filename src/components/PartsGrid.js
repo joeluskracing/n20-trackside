@@ -40,8 +40,8 @@ const PartsGrid = ({
               filterParts(locationParts[sub] || []).length > 0
             );
 
-            if (!hasVisibleParts && !showAll && searchTerm) {
-              return <div key={location} className="grid-cell placeholder" />;
+            if (!hasVisibleParts && searchTerm) {
+              return null;
             }
 
             return (

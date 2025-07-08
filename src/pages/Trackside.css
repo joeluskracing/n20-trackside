@@ -116,5 +116,11 @@ ul li.selected {
 }
 
 .save-notes {
-  margin-top: 20px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--primary-dark);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  z-index: 1000;
 }
