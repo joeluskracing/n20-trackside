@@ -374,7 +374,10 @@ const Trackside = () => {
 
   const renderNotesForm = (notes, setNotes) => {
     return notes.map((note, index) => (
-      <div className="notes-row" key={index}>
+      <div
+        className={`notes-row ${note.type === 'Paragraph' ? 'paragraph' : ''}`}
+        key={index}
+      >
         <div className="notes-label">{note.title}</div>
         <div className="notes-input">
           {note.type === 'Text' ? (
@@ -483,7 +486,7 @@ const Trackside = () => {
           </div>
         </div>
       ) : (
-        <> 
+        <div className="trackside-events-wrapper">
           <h2>Trackside Events</h2>
           <button className="create-event-button" onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
           {events.length > 0 ? (
@@ -585,7 +588,7 @@ const Trackside = () => {
               </form>
             </div>
           )}
-        </>
+        </div>
       )}
       {showTableLightbox && (
         <div className="lightbox">
