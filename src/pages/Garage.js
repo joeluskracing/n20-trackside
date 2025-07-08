@@ -351,9 +351,10 @@ const Garage = () => {
     <div className="garage">
       <div className="left-column">
         <h2>Garage Mode</h2>
+        <p className="tip">Right click a session to delete it.</p>
         {events.length > 0 ? (
           events.map((event, index) => (
-            <div key={index}>
+            <div key={index} className="event-group">
               {editingEventId === event.id ? (
                 <input
                   type="text"
@@ -361,6 +362,7 @@ const Garage = () => {
                   onChange={handleEditingNameChange}
                   onBlur={handleEditingNameBlur}
                   autoFocus
+                  className="editing-input"
                 />
               ) : (
                 <h3
@@ -388,6 +390,7 @@ const Garage = () => {
                             onChange={handleEditingNameChange}
                             onBlur={handleEditingNameBlur}
                             autoFocus
+                            className="editing-input"
                           />
                         ) : (
                           session.name
@@ -413,10 +416,12 @@ const Garage = () => {
             onChange={handleTitleChange}
             onBlur={handleTitleBlur}
             autoFocus
+            className="editing-input"
           />
         ) : (
           <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
         )}
+        <p className="tip">Double click the title to edit.</p>
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <PartsGrid
           gridLayout={gridLayout}
