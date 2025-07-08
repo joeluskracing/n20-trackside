@@ -124,7 +124,6 @@ ul li.selected {
   padding: 1rem 1.5rem;
   z-index: 1001;
 }
-
 .save-notes:hover {
   background-color: #388e3c;
 }

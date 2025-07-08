@@ -182,7 +182,6 @@ button:hover {
   padding: 1rem 1.5rem;
   z-index: 1001;
 }
-
 .save-notes:hover {
   background-color: #388e3c;
 }
@@ -192,7 +191,7 @@ button:hover {
   bottom: 0;
   left: 25%;
   width: 75%;
-  height: 80px;
+  height: 90px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 0;
