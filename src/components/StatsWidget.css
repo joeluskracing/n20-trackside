@@ -1,0 +1,13 @@
+.stats-widget .year-section {
+  margin-bottom: 1rem;
+}
+
+.stats-widget ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stats-widget li {
+  margin: 0.2rem 0;
+}
