@@ -368,7 +368,10 @@ const Trackside = () => {
 
   const renderNotesForm = (notes, setNotes) => {
     return notes.map((note, index) => (
-      <div className="notes-row" key={index}>
+      <div
+        className={`notes-row ${note.type === 'Paragraph' ? 'paragraph' : ''}`}
+        key={index}
+      >
         <div className="notes-label">{note.title}</div>
         <div className="notes-input">
           {note.type === 'Text' ? (
