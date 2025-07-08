@@ -116,16 +116,18 @@ button:hover {
 }
 
 .editing-input {
+  display: block;
   width: 100%;
-  font-size: inherit;
-  font-weight: inherit;
-  border: 1px solid #007bff;
-  background-color: #f0f8ff;
-  border-radius: 4px;
-  padding: 0.25rem;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
 }
-
 .search-controls {
   display: flex;
   align-items: center;
@@ -143,4 +145,19 @@ button:hover {
 
 .search-controls button.active {
   font-weight: bold;
+}
+.editing-input:focus {
+  outline: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.event-group > .editing-input {
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+.right-column > .editing-input {
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
 }
