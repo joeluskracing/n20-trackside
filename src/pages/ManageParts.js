@@ -103,13 +103,34 @@ const ManageParts = () => {
 
   const handleDropOnPart = (targetPart) => {
     if (!draggedPart || draggedPart.id === targetPart.id) return;
-    const updated = parts.map(p => {
-      if (p.id === draggedPart.id) return { ...p, order: targetPart.order };
-      if (p.displayLocation === targetPart.displayLocation && (p.subheading||'Others') === (targetPart.subheading||'Others')) {
-        if (p.order >= targetPart.order) return { ...p, order: p.order + 1 };
+
+    const sameContainer =
+      draggedPart.displayLocation === targetPart.displayLocation &&
+      (draggedPart.subheading?.trim() || 'Others') ===
+        (targetPart.subheading?.trim() || 'Others');
+
+    const updated = parts.map((p) => {
+      if (p.id === draggedPart.id) {
+        return {
+          ...p,
+          displayLocation: targetPart.displayLocation,
+          subheading: targetPart.subheading,
+          order: targetPart.order,
+        };
+      }
+
+      if (
+        p.displayLocation === targetPart.displayLocation &&
+        (p.subheading?.trim() || 'Others') ===
+          (targetPart.subheading?.trim() || 'Others')
+      ) {
+        if (p.order >= targetPart.order) {
+          return { ...p, order: p.order + 1 };
+        }
       }
       return p;
     });
+
     setParts(reorderParts(updated));
     setDraggedPart(null);
   };
