@@ -354,10 +354,11 @@ const Trackside = () => {
   
       // Add new session parts values
       await window.api.addSessionPartsValue2(currentSession, values);
-  
+
       // Save notes
       await window.api.updatePreSessionNotes(currentSession, preSessionNotes);
       await window.api.updatePostSessionNotes(currentSession, postSessionNotes);
+      await window.api.updateEventInfo(currentEvent.id, eventInfo.temperature, eventInfo.humidity, eventInfo.notes);
   
       // Refresh the sessions to ensure data is up-to-date but preserve current session
       await loadSessions(currentEvent.id);
@@ -470,35 +471,23 @@ const Trackside = () => {
             <div className="event-info box">
               {isEditingInfo ? (
                 <>
-                  <label>
-                    Track:
+                  <div className="form-group">
+                    <label>Track:</label>
                     <input type="text" list="track-options" value={editTrack} onChange={(e) => setEditTrack(e.target.value)} />
                     <datalist id="track-options">
                       {tracks.map((track, index) => (
                         <option key={index} value={track.name} />
                       ))}
                     </datalist>
-                  </label>
-                  <label>
-                    Event Name:
+                  </div>
+                  <div className="form-group">
+                    <label>Event Name:</label>
                     <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
-                  </label>
-                  <label>
-                    Event Date:
+                  </div>
+                  <div className="form-group">
+                    <label>Event Date:</label>
                     <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
-                  </label>
-                  <label>
-                    Temperature:
-                    <input type="text" value={eventInfo.temperature || ''} onChange={(e) => setEventInfo({ ...eventInfo, temperature: e.target.value })} />
-                  </label>
-                  <label>
-                    Humidity:
-                    <input type="text" value={eventInfo.humidity || ''} onChange={(e) => setEventInfo({ ...eventInfo, humidity: e.target.value })} />
-                  </label>
-                  <label>
-                    Notes:
-                    <textarea value={eventInfo.notes || ''} onChange={(e) => setEventInfo({ ...eventInfo, notes: e.target.value })} />
-                  </label>
+                  </div>
                   <button onClick={saveEventInfo}>💾</button>
                   <button onClick={cancelEditInfo}>Cancel</button>
                 </>
@@ -507,12 +496,23 @@ const Trackside = () => {
                   <div className="info-row"><strong>Track:</strong> {tracks.find(t => t.id === currentEvent.trackId)?.name}</div>
                   <div className="info-row"><strong>Event:</strong> {currentEvent.name}</div>
                   <div className="info-row"><strong>Date:</strong> {new Date(currentEvent.date).toISOString().split('T')[0]}</div>
-                  <div className="info-row"><strong>Temp:</strong> {eventInfo.temperature || ''}</div>
-                  <div className="info-row"><strong>Humidity:</strong> {eventInfo.humidity || ''}</div>
-                  <div className="info-row"><strong>Notes:</strong> {eventInfo.notes || ''}</div>
                   <button className="edit-info" onClick={startEditInfo}>✏️</button>
                 </>
               )}
+            </div>
+            <div className="event-conditions box">
+              <div className="form-group">
+                <label>Temp:</label>
+                <input type="text" value={eventInfo.temperature || ''} onChange={(e) => setEventInfo({ ...eventInfo, temperature: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>Humidity:</label>
+                <input type="text" value={eventInfo.humidity || ''} onChange={(e) => setEventInfo({ ...eventInfo, humidity: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>General Notes:</label>
+                <textarea value={eventInfo.notes || ''} onChange={(e) => setEventInfo({ ...eventInfo, notes: e.target.value })} />
+              </div>
             </div>
             <button className="end-event" onClick={handleEndEvent}>End Event</button>
           </div>

@@ -62,7 +62,8 @@ li {
   border-radius: 4px;
   padding: 10px;
   margin-bottom: 10px;
-  width: 100%; /* Ensure the box takes full width */
+  width: 100%;
+  box-sizing: border-box;
   background-color: var(--surface-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -78,6 +79,20 @@ li {
 
 .event-info button {
   margin-right: 5px;
+}
+
+.event-conditions {
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
 }
 
 .create-event {
