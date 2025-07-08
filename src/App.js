@@ -1,7 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import TracksideNotice from './components/TracksideNotice';
 import Home from './pages/Home';
 import Garage from './pages/Garage';
 import Trackside from './pages/Trackside';
@@ -17,7 +16,6 @@ const App = () => {
   return (
     <EventProvider>
     <CarProvider>
-      <TracksideNotice />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
