@@ -83,7 +83,7 @@ const Home = () => {
 
   return (
     <div className="home-grid">
-      <div className="grid-box">
+      <div className="grid-box car-box">
         <h2>Currently Selected Car</h2>
         {cars.length === 0 ? (
           <div>
@@ -120,27 +120,27 @@ const Home = () => {
             />
           </div>
         )}
-      </div>
-      <div className="grid-box">
-        <h2>Parts List</h2>
-        {selectedCar === '' ? (
-          <p>Select a car to see parts</p>
-        ) : parts.length === 0 ? (
-          <div>
-            <p>No parts! Add parts now.</p>
-            <button onClick={handleAddPart}>Add Part</button>
-          </div>
-        ) : (
-          <div>
-            <button onClick={handleAddPart}>Add Part</button>
-            <button onClick={handleModifyParts}>Modify Parts</button>
-            <ul>
-              {parts.map((part) => (
-                <li key={part.id}>{part.name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="parts-section">
+          <h2>Parts List</h2>
+          {selectedCar === '' ? (
+            <p>Select a car to see parts</p>
+          ) : parts.length === 0 ? (
+            <div>
+              <p>No parts! Add parts now.</p>
+              <button onClick={handleAddPart}>Add Part</button>
+            </div>
+          ) : (
+            <div>
+              <button onClick={handleAddPart}>Add Part</button>
+              <button onClick={handleModifyParts}>Modify Parts</button>
+              <ul>
+                {parts.map((part) => (
+                  <li key={part.id}>{part.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
       <TracksideWidget />
     </div>
