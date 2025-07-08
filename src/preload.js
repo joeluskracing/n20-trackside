@@ -510,7 +510,7 @@ contextBridge.exposeInMainWorld('api', {
   },
   getChecklistNotes: async () => {
     try {
-      const notes = await ChecklistNote.findAll({ order: [['createdAt', 'DESC']] });
+      const notes = await ChecklistNote.findAll({ order: [['orderIndex', 'ASC']] });
       return notes.map(n => n.toJSON());
     } catch (error) {
       console.error('Error fetching checklist notes:', error);
@@ -519,7 +519,8 @@ contextBridge.exposeInMainWorld('api', {
   },
   addChecklistNote: async (title, content) => {
     try {
-      const note = await ChecklistNote.create({ title, content });
+      const maxOrder = await ChecklistNote.max('orderIndex');
+      const note = await ChecklistNote.create({ title, content, orderIndex: (isNaN(maxOrder) ? 0 : maxOrder + 1) });
       return note.toJSON();
     } catch (error) {
       console.error('Error adding checklist note:', error);
@@ -537,6 +538,15 @@ contextBridge.exposeInMainWorld('api', {
       await ChecklistNote.destroy({ where: { id } });
     } catch (error) {
       console.error('Error deleting checklist note:', error);
+    }
+  },
+  reorderChecklistNotes: async (orderedIds) => {
+    try {
+      for (let i = 0; i < orderedIds.length; i++) {
+        await ChecklistNote.update({ orderIndex: i }, { where: { id: orderedIds[i] } });
+      }
+    } catch (error) {
+      console.error('Error reordering checklist notes:', error);
     }
   },
   exportCarData: async (carId) => {

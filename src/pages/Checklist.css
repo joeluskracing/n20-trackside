@@ -12,9 +12,10 @@
 .notes-list {
   list-style: none;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+  grid-auto-flow: dense;
 }
 
 .note-item {
@@ -33,4 +34,15 @@
 
 .note-item textarea {
   resize: vertical;
+}
+
+.note-item .dates {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+@media (max-width: 600px) {
+  .notes-list {
+    grid-template-columns: 1fr;
+  }
 }
