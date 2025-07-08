@@ -173,6 +173,36 @@ button:hover {
   bottom: 20px;
 }
 
+.save-notes {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  z-index: 1001;
+}
+
+.save-notes:hover {
+  background-color: #388e3c;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 25%;
+  width: 75%;
+  height: 80px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  z-index: 1000;
+}
+
+.bottom-space {
+  height: 80px;
+}
+
 .tip {
   font-size: 0.85rem;
   color: #555;
