@@ -36,7 +36,7 @@ const Garage = () => {
   const [editingName, setEditingName] = useState('');
   const [sessionTitle, setSessionTitle] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
-  const [clickTimer, setClickTimer] = useState(null);
+  const [eventClickTimer, setEventClickTimer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
   const navigate = useNavigate();
@@ -236,10 +236,19 @@ const Garage = () => {
   };
 
   const handleEventClick = (eventId) => {
-    setSelectedEventId(eventId);
+    if (editingEventId) return;
+    if (!eventClickTimer) {
+      setEventClickTimer(
+        setTimeout(() => {
+          setSelectedEventId((prev) => (prev === eventId ? null : eventId));
+          setEventClickTimer(null);
+        }, 200)
+      );
+    }
   };
 
-  const handleSessionClick = async (session) => {
+  const handleLoadSession = async (session) => {
+    if (editingSessionId) return;
     const loadSession = confirm(`Would you like to load ${session.name}?`);
     if (loadSession) {
       const sessionPartsValues = await window.api.getSessionPartsValuesBySessionId(session.id);
@@ -250,29 +259,16 @@ const Garage = () => {
     }
   };
 
-  const handleSingleClick = (session) => {
-    if (!clickTimer) {
-      setClickTimer(setTimeout(() => {
-        handleSessionClick(session);
-        setClickTimer(null);
-      }, 200)); // Adjust delay as needed
-    }
-  };
-
-  const handleDoubleClick = (session) => {
-    if (clickTimer) {
-      clearTimeout(clickTimer);
-      setClickTimer(null);
-    }
-    handleSessionDoubleClick(session);
-  };
-
   const handleSessionDoubleClick = (session) => {
     setEditingSessionId(session.id);
     setEditingName(session.name);
   };
 
   const handleEventDoubleClick = (event) => {
+    if (eventClickTimer) {
+      clearTimeout(eventClickTimer);
+      setEventClickTimer(null);
+    }
     setEditingEventId(event.id);
     setEditingName(event.name);
   };
@@ -375,13 +371,14 @@ const Garage = () => {
                   className="editing-input"
                 />
               ) : (
-                <h3
+                <button
+                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
                   onClick={() => handleEventClick(event.id)}
                   onDoubleClick={() => handleEventDoubleClick(event)}
                   onContextMenu={(e) => handleContextMenu(e, event, 'event')}
                 >
                   {event.name}
-                </h3>
+                </button>
               )}
               {selectedEventId === event.id && (
                 <ul>
@@ -389,8 +386,8 @@ const Garage = () => {
                     event.Sessions.map((session, index) => (
                       <li
                         key={index}
-                        onClick={() => handleSingleClick(session)}
-                        onDoubleClick={() => handleDoubleClick(session)}
+                        className="session-item"
+                        onDoubleClick={() => handleSessionDoubleClick(session)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
                         {editingSessionId === session.id ? (
@@ -403,7 +400,10 @@ const Garage = () => {
                             className="editing-input"
                           />
                         ) : (
-                          session.name
+                          <>
+                            <span>{session.name}</span>
+                            <button className="load-btn" onClick={() => handleLoadSession(session)}>Load</button>
+                          </>
                         )}
                       </li>
                     ))
