@@ -181,17 +181,17 @@ button:hover {
 .bottom-bar {
   position: fixed;
   bottom: 0;
-  left: 25%;
-  width: 75%;
-  height: 90px;
+  left: 0;
+  width: 100%;
+  height: 40px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 0;
-  z-index: 1000;
+  z-index: -1;
 }
 
 .bottom-space {
-  height: 80px;
+  height: 40px;
 }
 
 .tip {
