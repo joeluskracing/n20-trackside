@@ -83,7 +83,7 @@ const Settings = () => {
       <div className="left-column">
         <h2>Settings</h2>
         <button
-          className={activeTab === 'notes' ? 'active' : ''}
+          className={`nav-button ${activeTab === 'notes' ? 'active' : ''}`}
           onClick={() => setActiveTab('notes')}
         >
           Session Notes
@@ -92,8 +92,10 @@ const Settings = () => {
       <div className="right-column">
         {activeTab === 'notes' && (
           <>
-            {renderFields(preFields, 'pre')}
-            {renderFields(postFields, 'post')}
+            <div className="notes-columns">
+              {renderFields(preFields, 'pre')}
+              {renderFields(postFields, 'post')}
+            </div>
             <button onClick={handleSave}>Save Templates</button>
           </>
         )}

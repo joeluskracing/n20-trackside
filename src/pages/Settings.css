@@ -34,4 +34,36 @@
 
 .template-section {
   margin-bottom: 1rem;
+  background-color: var(--surface-color);
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.notes-columns {
+  display: flex;
+  gap: 20px;
+  width: calc(100% - 20px);
+}
+
+.notes-columns .template-section {
+  flex: 0 0 calc(50% - 10px);
+  width: calc(50% - 10px);
+}
+
+.nav-button {
+  width: 100%;
+  text-align: left;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1.1em;
+  margin-bottom: 0.5rem;
+  text-transform: none;
+}
+
+.nav-button.active {
+  background-color: var(--primary-dark);
 }

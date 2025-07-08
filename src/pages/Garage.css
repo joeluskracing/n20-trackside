@@ -130,6 +130,7 @@ button:hover {
   cursor: pointer;
   border-radius: 4px;
   font-size: 1.1em;
+  text-transform: none;
   box-shadow: none;
 }
 

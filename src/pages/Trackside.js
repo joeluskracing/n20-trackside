@@ -413,16 +413,17 @@ const Trackside = () => {
             <h2>{currentEvent.name}</h2>
             <ul>
               {sessions.map((session, index) => (
-                <li
-                  key={index}
-                  className={session.id == currentSession ? 'selected' : ''}
-                  onClick={() => handleSessionClick(session.id)}
-                >
-                  {session.name || session}
+                <li key={index}>
+                  <button
+                    className={`session-button ${session.id == currentSession ? 'active' : ''}`}
+                    onClick={() => handleSessionClick(session.id)}
+                  >
+                    {session.name || session}
+                  </button>
                 </li>
               ))}
             </ul>
-            <button onClick={handleEndEvent}>End Event</button>
+            <button className="end-event" onClick={handleEndEvent}>End Event</button>
           </div>
           <div className="right-column">
             <div className="notes-columns">
