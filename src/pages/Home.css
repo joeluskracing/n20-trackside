@@ -5,6 +5,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   padding: 1rem;
+  grid-auto-rows: minmax(0, auto);
 }
 
 .grid-box {
@@ -47,4 +48,8 @@
   margin-top: 1rem;
   color: green;
   font-size: 0.9rem;
+}
+
+.grid-box.expand {
+  grid-row: span 2;
 }
