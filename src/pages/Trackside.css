@@ -1,7 +1,7 @@
 .trackside {
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 1rem;
 }
 
 .dashboard {
@@ -11,13 +11,13 @@
 
 .left-column {
   width: 25%;
-  padding-right: 20px;
+  padding: 1rem;
   border-right: 1px solid #ddd;
 }
 
 .right-column {
   width: 75%;
-  padding-left: 20px;
+  padding: 1rem;
 }
 
 .notes-columns {
