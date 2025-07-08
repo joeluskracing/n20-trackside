@@ -13,19 +13,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.parts-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.grid-cell {
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 4px;
-  background-color: var(--surface-color);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
+/* Grid styles are shared with Garage and Trackside via PartsGrid.css */
 
 .grid-cell h3 {
   margin: 0;
@@ -42,15 +30,7 @@
   padding: 0;
 }
 
-.grid-cell ul li {
-  display: flex;
-  align-items: center;
-  margin: 5px 0;
-}
-
-.grid-cell ul li button {
-  margin-left: 10px;
-}
+/* list items use the shared .part-item styles */
 
 .staged-deletions {
   background-color: red;
