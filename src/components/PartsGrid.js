@@ -57,39 +57,41 @@ const PartsGrid = ({
                       <h4>{subheading}</h4>
                       <ul>
                         {filtered.map((part) => (
-                          <li key={part.id}>
-                            {part.name}
-                            {part.entryType === 'text' && (
-                              <input
-                                type="text"
-                                value={values[part.id] || ''}
-                                onChange={(e) =>
-                                  handleChange(part.id, e.target.value)
-                                }
-                              />
-                            )}
-                            {part.entryType === 'number' && (
-                              <div className="number-input">
-                                <button onClick={() => handleDecrement(part.id)}>
-                                  -
-                                </button>
+                          <li key={part.id} className="part-item">
+                            <span className="part-name">{part.name}</span>
+                            <span className="part-controls">
+                              {part.entryType === 'text' && (
                                 <input
-                                  type="number"
-                                  value={values[part.id] || 0}
+                                  type="text"
+                                  value={values[part.id] || ''}
                                   onChange={(e) =>
-                                    handleChange(part.id, Number(e.target.value))
+                                    handleChange(part.id, e.target.value)
                                   }
                                 />
-                                <button onClick={() => handleIncrement(part.id)}>
-                                  +
+                              )}
+                              {part.entryType === 'number' && (
+                                <div className="number-input">
+                                  <button onClick={() => handleDecrement(part.id)}>
+                                    -
+                                  </button>
+                                  <input
+                                    type="number"
+                                    value={values[part.id] || 0}
+                                    onChange={(e) =>
+                                      handleChange(part.id, Number(e.target.value))
+                                    }
+                                  />
+                                  <button onClick={() => handleIncrement(part.id)}>
+                                    +
+                                  </button>
+                                </div>
+                              )}
+                              {part.entryType === 'table' && (
+                                <button onClick={() => handleTableLinkClick(part)}>
+                                  Table
                                 </button>
-                              </div>
-                            )}
-                            {part.entryType === 'table' && (
-                              <button onClick={() => handleTableLinkClick(part)}>
-                                Table
-                              </button>
-                            )}
+                              )}
+                            </span>
                           </li>
                         ))}
                       </ul>
