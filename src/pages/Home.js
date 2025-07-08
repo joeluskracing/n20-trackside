@@ -88,29 +88,37 @@ const Home = () => {
           <div>
             <p>There are no cars! Create one now.</p>
             <button onClick={handleCreateCar}>Create Car</button>
+            <button onClick={handleImportButton}>Import Car</button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".json"
+              onChange={handleFileChange}
+            />
           </div>
         ) : (
           <div>
-          <select value={selectedCar || ''} onChange={handleCarChange}>
-            <option value="">Select a car</option>
-            {cars.map((car) => (
-              <option key={car.id} value={car.id}>
-                {car.name}
-              </option>
-            ))}
-          </select>
-          <button onClick={handleCreateCar}>Add another car</button>
-          <button onClick={handleExportCar} disabled={!selectedCar}>Export Car</button>
-          <button onClick={handleImportButton}>Import Car</button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept=".json"
-            onChange={handleFileChange}
-          />
-        </div>
-      )}
+            <select value={selectedCar || ''} onChange={handleCarChange}>
+              <option value="">Select a car</option>
+              {cars.map((car) => (
+                <option key={car.id} value={car.id}>
+                  {car.name}
+                </option>
+              ))}
+            </select>
+            <button onClick={handleCreateCar}>Add another car</button>
+            <button onClick={handleExportCar} disabled={!selectedCar}>Export Car</button>
+            <button onClick={handleImportButton}>Import Car</button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".json"
+              onChange={handleFileChange}
+            />
+          </div>
+        )}
       </div>
       <div className="grid-box">
         <h2>Parts List</h2>
