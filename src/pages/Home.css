@@ -55,3 +55,11 @@
 .grid-box.expand {
   grid-row: span 2;
 }
+
+.car-box .parts-section {
+  margin-top: 1rem;
+}
+
+.home-grid .trackside-widget {
+  grid-column: 2;
+}

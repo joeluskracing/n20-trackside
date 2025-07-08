@@ -1,17 +1,4 @@
-.trackside-widget ul {
-  list-style-type: none;
-  padding: 0;
-}
 
-.trackside-widget li {
-  padding: 8px;
-  cursor: pointer;
-}
-
-.trackside-widget li.selected {
-  color: red;
-  font-weight: bold;
-}
 
 .trackside-widget .create-event {
   margin-top: 20px;

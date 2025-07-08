@@ -48,3 +48,30 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   padding: 1rem;
 }
+
+.event-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.event-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.create-event-button {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  background-color: #4caf50;
+}
+
+.event-title {
+  text-align: left;
+}
+
+.event-date {
+  margin-left: auto;
+  text-align: right;
+}

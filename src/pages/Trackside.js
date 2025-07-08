@@ -476,20 +476,27 @@ const Trackside = () => {
           </div>
         </div>
       ) : (
-        <>
+        <> 
           <h2>Trackside Events</h2>
+          <button className="create-event-button" onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
           {events.length > 0 ? (
-            <ul>
+            <div className="event-list">
               {events.map((event, index) => (
-                <li key={index} onClick={() => setCurrentEvent(event)} onContextMenu={(e) => handleContextMenu(e, event)}>
-                  {event.name} - {new Date(event.date).toLocaleDateString()}
-                </li>
+                <button
+                  key={index}
+                  className="event-button"
+                  style={{ filter: `saturate(${1 - index * 0.1})` }}
+                  onClick={() => setCurrentEvent(event)}
+                  onContextMenu={(e) => handleContextMenu(e, event)}
+                >
+                  <span className="event-title">{event.name}</span>
+                  <span className="event-date">{new Date(event.date).toLocaleDateString()}</span>
+                </button>
               ))}
-            </ul>
+            </div>
           ) : (
             <p>No trackside events available. Create a new event.</p>
           )}
-          <button onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
 
           {showForm && (
             <div className="create-event">
