@@ -46,6 +46,19 @@ const Trackside = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
+  const [preTemplate, setPreTemplate] = useState([]);
+  const [postTemplate, setPostTemplate] = useState([]);
+
+  useEffect(() => {
+    const loadTemplates = async () => {
+      const templates = await window.api.getNotesTemplates();
+      const pre = templates.find(t => t.name === 'pre');
+      const post = templates.find(t => t.name === 'post');
+      setPreTemplate(pre ? pre.fields : []);
+      setPostTemplate(post ? post.fields : []);
+    };
+    loadTemplates();
+  }, []);
 
   useEffect(() => {
     if (carId) {
@@ -217,30 +230,8 @@ const Trackside = () => {
     );
     const createdSessions = await Promise.all(sessionPromises);
 
-    const preSessionNotesTemplate = [
-      { "title": "Starting Position", "type": "Text", "value": "" },
-      { "title": "Starting Fuel", "type": "Text", "value": "" },
-      { "title": "LF Tire Compound", "type": "Text", "value": "" },
-      { "title": "RF Tire Compound", "type": "Text", "value": "" },
-      { "title": "LR Tire Compound", "type": "Text", "value": "" },
-      { "title": "RR Tire Compound", "type": "Text", "value": "" },
-      { "title": "LF Tire Pressure", "type": "Text", "value": "" },
-      { "title": "RF Tire Pressure", "type": "Text", "value": "" },
-      { "title": "LR Tire Pressure", "type": "Text", "value": "" },
-      { "title": "RR Tire Pressure", "type": "Text", "value": "" },
-      { "title": "Notes", "type": "Paragraph", "value": "" }
-    ];
-
-    const postSessionNotesTemplate = [
-      { "title": "Finishing Position", "type": "Text", "value": "" },
-      { "title": "Finishing Fuel", "type": "Text", "value": "" },
-      { "title": "LF Tire Pressure", "type": "Text", "value": "" },
-      { "title": "RF Tire Pressure", "type": "Text", "value": "" },
-      { "title": "LR Tire Pressure", "type": "Text", "value": "" },
-      { "title": "RR Tire Pressure", "type": "Text", "value": "" },
-      { "title": "Notes", "type": "Paragraph", "value": "" },
-      { "title": "Driver Feedback", "type": "Paragraph", "value": "" }
-    ];
+    const preSessionNotesTemplate = preTemplate.length > 0 ? preTemplate : [];
+    const postSessionNotesTemplate = postTemplate.length > 0 ? postTemplate : [];
 
     await Promise.all(
       createdSessions.map(session =>

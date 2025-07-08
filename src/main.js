@@ -9,6 +9,7 @@ const {
   Session,
   PartsValues,
   SessionPartsValues,
+  NotesTemplate,
   PreSessionNotes,
   PostSessionNotes
 } = require('./database');
@@ -62,6 +63,9 @@ ipcMain.handle('export-car-data', async (event, carId) => {
     });
     if (!car) return null;
 
+    const templates = await NotesTemplate.findAll();
+    const exportData = { ...car.toJSON(), NotesTemplates: templates.map(t => t.toJSON()) };
+
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: 'Save Car Data',
       defaultPath: `car_${car.name.replace(/\s+/g, '_')}_${car.id}.json`,
@@ -72,7 +76,7 @@ ipcMain.handle('export-car-data', async (event, carId) => {
       return null;
     }
 
-    fs.writeFileSync(filePath, JSON.stringify(car.toJSON(), null, 2));
+    fs.writeFileSync(filePath, JSON.stringify(exportData, null, 2));
     // Open the exported file in the user's file explorer
     shell.showItemInFolder(filePath);
     return filePath;

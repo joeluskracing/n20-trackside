@@ -273,6 +273,41 @@ sequelize.sync({ force: false }).then(async () => {  // Do not use force: true i
   } else {
     console.log('Garage track already exists');
   }
+
+  const preDefault = [
+    { title: 'Starting Position', type: 'Text', value: '' },
+    { title: 'Starting Fuel', type: 'Text', value: '' },
+    { title: 'LF Tire Compound', type: 'Text', value: '' },
+    { title: 'RF Tire Compound', type: 'Text', value: '' },
+    { title: 'LR Tire Compound', type: 'Text', value: '' },
+    { title: 'RR Tire Compound', type: 'Text', value: '' },
+    { title: 'LF Tire Pressure', type: 'Text', value: '' },
+    { title: 'RF Tire Pressure', type: 'Text', value: '' },
+    { title: 'LR Tire Pressure', type: 'Text', value: '' },
+    { title: 'RR Tire Pressure', type: 'Text', value: '' },
+    { title: 'Notes', type: 'Paragraph', value: '' }
+  ];
+
+  const postDefault = [
+    { title: 'Finishing Position', type: 'Text', value: '' },
+    { title: 'Finishing Fuel', type: 'Text', value: '' },
+    { title: 'LF Tire Pressure', type: 'Text', value: '' },
+    { title: 'RF Tire Pressure', type: 'Text', value: '' },
+    { title: 'LR Tire Pressure', type: 'Text', value: '' },
+    { title: 'RR Tire Pressure', type: 'Text', value: '' },
+    { title: 'Notes', type: 'Paragraph', value: '' },
+    { title: 'Driver Feedback', type: 'Paragraph', value: '' }
+  ];
+
+  await NotesTemplate.findOrCreate({
+    where: { name: 'pre' },
+    defaults: { fields: preDefault }
+  });
+
+  await NotesTemplate.findOrCreate({
+    where: { name: 'post' },
+    defaults: { fields: postDefault }
+  });
 });
 
 module.exports = {
