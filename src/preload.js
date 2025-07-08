@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, PreSessionNotes, PostSessionNotes } = require('./database');
+const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes } = require('./database');
 const fs = require('fs');
 const path = require('path');
 
@@ -312,6 +312,27 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error updating post-session notes:', error);
     }
   },
+  getNotesTemplates: async () => {
+    try {
+      const templates = await NotesTemplate.findAll();
+      return templates.map(t => t.toJSON());
+    } catch (error) {
+      console.error('Error fetching notes templates:', error);
+      return [];
+    }
+  },
+  updateNotesTemplate: async (name, fields) => {
+    try {
+      const existing = await NotesTemplate.findOne({ where: { name } });
+      if (existing) {
+        await NotesTemplate.update({ fields }, { where: { name } });
+      } else {
+        await NotesTemplate.create({ name, fields });
+      }
+    } catch (error) {
+      console.error('Error updating notes template:', error);
+    }
+  },
   deleteSessionPartsValuesBySessionId: async (sessionId) => {
     try {
       await SessionPartsValues.destroy({ where: { sessionId } });
@@ -331,6 +352,18 @@ contextBridge.exposeInMainWorld('api', {
     try {
       const data = JSON.parse(fs.readFileSync(filePath));
       const newCar = await Car.create({ name: data.name });
+
+      if (data.NotesTemplates) {
+        for (const tmpl of data.NotesTemplates) {
+          const { name, fields } = tmpl;
+          const existing = await NotesTemplate.findOne({ where: { name } });
+          if (existing) {
+            await NotesTemplate.update({ fields }, { where: { name } });
+          } else {
+            await NotesTemplate.create({ name, fields });
+          }
+        }
+      }
 
       const partIdMap = {};
       if (data.Parts) {
