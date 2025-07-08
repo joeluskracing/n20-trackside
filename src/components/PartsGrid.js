@@ -14,37 +14,49 @@ const PartsGrid = ({
   showAll,
   searchTerm,
 }) => {
+  const filterParts = (parts) =>
+    parts.filter(
+      (part) =>
+        showAll ||
+        part.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
   return (
     <div className="parts-grid">
       {gridLayout.map((row, rowIndex) => (
         <div key={rowIndex} className="grid-row">
           {row.map((location) => {
-            const hasParts =
-              groupedParts[location] &&
-              Object.values(groupedParts[location]).some(
-                (arr) => Array.isArray(arr) && arr.length > 0
-              );
+            const locationParts = groupedParts[location] || {};
+            const hasParts = Object.values(locationParts).some(
+              (arr) => Array.isArray(arr) && arr.length > 0
+            );
 
             if (!hasParts) {
+              return <div key={location} className="grid-cell placeholder" />;
+            }
+
+            // Determine if any parts in this location match the current search
+            const hasVisibleParts = Object.keys(locationParts).some((sub) =>
+              filterParts(locationParts[sub] || []).length > 0
+            );
+
+            if (!hasVisibleParts && !showAll && searchTerm) {
               return <div key={location} className="grid-cell placeholder" />;
             }
 
             return (
               <div key={location} className="grid-cell">
                 <h3>{location}</h3>
-                {Object.keys(groupedParts[location] || {}).map((subheading) => (
-                  <div key={subheading}>
-                    <h4>{subheading}</h4>
-                    <ul>
-                      {(groupedParts[location][subheading] || [])
-                        .filter(
-                          (part) =>
-                            showAll ||
-                            part.name
-                              .toLowerCase()
-                              .includes(searchTerm.toLowerCase())
-                        )
-                        .map((part) => (
+                {Object.keys(locationParts).map((subheading) => {
+                  const filtered = filterParts(locationParts[subheading] || []);
+                  if (filtered.length === 0 && !showAll && searchTerm) {
+                    return null;
+                  }
+                  return (
+                    <div key={subheading}>
+                      <h4>{subheading}</h4>
+                      <ul>
+                        {filtered.map((part) => (
                           <li key={part.id}>
                             {part.name}
                             {part.entryType === 'text' && (
@@ -58,9 +70,7 @@ const PartsGrid = ({
                             )}
                             {part.entryType === 'number' && (
                               <div className="number-input">
-                                <button
-                                  onClick={() => handleDecrement(part.id)}
-                                >
+                                <button onClick={() => handleDecrement(part.id)}>
                                   -
                                 </button>
                                 <input
@@ -70,25 +80,22 @@ const PartsGrid = ({
                                     handleChange(part.id, Number(e.target.value))
                                   }
                                 />
-                                <button
-                                  onClick={() => handleIncrement(part.id)}
-                                >
+                                <button onClick={() => handleIncrement(part.id)}>
                                   +
                                 </button>
                               </div>
                             )}
                             {part.entryType === 'table' && (
-                              <button
-                                onClick={() => handleTableLinkClick(part)}
-                              >
+                              <button onClick={() => handleTableLinkClick(part)}>
                                 Table
                               </button>
                             )}
                           </li>
                         ))}
-                    </ul>
-                  </div>
-                ))}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             );
           })}

@@ -125,3 +125,22 @@ button:hover {
   padding: 0.25rem;
   box-sizing: border-box;
 }
+
+.search-controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search-controls input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.search-controls button {
+  margin-left: 5px;
+}
+
+.search-controls button.active {
+  font-weight: bold;
+}
