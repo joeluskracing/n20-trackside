@@ -40,6 +40,8 @@ const Garage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     if (carId) {
@@ -347,6 +349,14 @@ const Garage = () => {
     }
   };
 
+  const handleShowAll = () => {
+    setShowAll(true);
+  };
+
+  const handleHideAll = () => {
+    setShowAll(false);
+  };
+
   return (
     <div className="garage">
       <div className="left-column">
@@ -423,6 +433,26 @@ const Garage = () => {
         )}
         <p className="tip">Double click the title to edit.</p>
         <button onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
+        <div className="search-controls">
+          <input
+            type="text"
+            placeholder="Search Parts"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button
+            className={showAll ? 'active' : ''}
+            onClick={handleShowAll}
+          >
+            Show All
+          </button>
+          <button
+            className={!showAll ? 'active' : ''}
+            onClick={handleHideAll}
+          >
+            Hide All
+          </button>
+        </div>
         <PartsGrid
           gridLayout={gridLayout}
           groupedParts={groupedParts}
@@ -431,8 +461,8 @@ const Garage = () => {
           handleIncrement={handleIncrement}
           handleDecrement={handleDecrement}
           handleTableLinkClick={handleTableLinkClick}
-          showAll={true}
-          searchTerm={''}
+          showAll={showAll}
+          searchTerm={searchTerm}
         />
       </div>
       {showTableLightbox && (
