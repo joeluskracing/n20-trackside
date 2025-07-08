@@ -5,6 +5,7 @@
 .left-column {
   width: 25%;
   padding: 1rem;
+  border-right: 1px solid #ddd;
 }
 
 .right-column {
