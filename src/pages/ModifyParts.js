@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ModifyParts.css';
+import '../components/PartsGrid.css';
 import { useCar } from '../context/CarContext';
 
 const ModifyParts = () => {
@@ -165,22 +166,28 @@ const ModifyParts = () => {
           </div>
         )}
         <div className="parts-grid">
-          {displayGrid.flat().map((location) => (
-            <div key={location} className="grid-cell">
-              <h3>{location}</h3>
-              {groupedParts[location] && Object.keys(groupedParts[location]).map((subheading) => (
-                <div key={subheading}>
-                  <h4>{subheading}</h4>
-                  <ul>
-                    {groupedParts[location][subheading].map((part, index) => (
-                      <li key={part.id}>
-                        <button onClick={() => stageDeletion(part.id)}>X</button>
-                        <button onClick={() => movePart(part.id, 'up', location, subheading)}>&uarr;</button>
-                        <button onClick={() => movePart(part.id, 'down', location, subheading)}>&darr;</button>
-                        {part.name}
-                      </li>
-                    ))}
-                  </ul>
+          {displayGrid.map((row, rowIndex) => (
+            <div key={rowIndex} className="grid-row">
+              {row.map((location) => (
+                <div key={location} className="grid-cell">
+                  <h3>{location}</h3>
+                  {groupedParts[location] && Object.keys(groupedParts[location]).map((subheading) => (
+                    <div key={subheading}>
+                      <h4>{subheading}</h4>
+                      <ul>
+                        {groupedParts[location][subheading].map((part) => (
+                          <li key={part.id} className="part-item">
+                            <span className="part-name">{part.name}</span>
+                            <span className="part-controls">
+                              <button onClick={() => stageDeletion(part.id)}>X</button>
+                              <button onClick={() => movePart(part.id, 'up', location, subheading)}>&uarr;</button>
+                              <button onClick={() => movePart(part.id, 'down', location, subheading)}>&darr;</button>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
