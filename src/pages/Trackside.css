@@ -23,6 +23,7 @@
 .notes-columns {
   display: flex;
   gap: 20px;
+  width: calc(100% - 20px);
 }
 
 .notes-columns .box {
