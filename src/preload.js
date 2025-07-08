@@ -104,6 +104,27 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error fetching events from last 24 hours:', error);
     }
   },
+  getTodayTracksideEvent: async (carId) => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    try {
+      const event = await Event.findOne({
+        where: {
+          carId,
+          trackId: { [Op.ne]: 1 },
+          date: {
+            [Op.gte]: start,
+            [Op.lte]: end
+          }
+        }
+      });
+      return event ? event.toJSON() : null;
+    } catch (error) {
+      console.error("Error fetching today's event:", error);
+    }
+  },
   addSession: async (eventId, date, type, name) => {
     try {
       const session = await Session.create({ eventId, date, type, name });
