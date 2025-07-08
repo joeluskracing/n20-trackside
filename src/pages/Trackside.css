@@ -26,8 +26,10 @@
 }
 
 .notes-columns .box {
-  width: auto;
-  flex: 1;
+  /* Each notes box should take up half of the available width while leaving
+     space for the gap between them */
+  flex: 0 0 calc(50% - 10px);
+  width: calc(50% - 10px);
 }
 
 ul {
