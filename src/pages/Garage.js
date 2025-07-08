@@ -461,6 +461,9 @@ const Garage = () => {
           showAll={showAll}
           searchTerm={searchTerm}
         />
+        <div className="bottom-space"></div>
+        <button className="save-notes" onClick={handleSubmit}>Save Notes</button>
+        <div className="bottom-bar"></div>
       </div>
       {showTableLightbox && (
         <div className="lightbox">

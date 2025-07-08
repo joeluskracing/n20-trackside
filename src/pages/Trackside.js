@@ -477,8 +477,10 @@ const Trackside = () => {
                 showAll={showAll}
                 searchTerm={searchTerm}
               />
+              <div className="bottom-space"></div>
             </div>
             <button className="save-notes" onClick={handleSetupSubmit}>Save Notes</button>
+            <div className="bottom-bar"></div>
           </div>
         </div>
       ) : (
