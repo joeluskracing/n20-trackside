@@ -211,6 +211,28 @@ const NotesTemplate = sequelize.define('NotesTemplate', {
   timestamps: true
 });
 
+const CarTemplate = sequelize.define('CarTemplate', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  carId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  parts: {
+    type: DataTypes.JSON,
+    allowNull: false
+  }
+}, {
+  timestamps: true
+});
+
 const PreSessionNotes = sequelize.define('PreSessionNotes', {
   sessionId: {
     type: DataTypes.INTEGER,
@@ -340,6 +362,7 @@ module.exports = {
   NotesTemplate,
   PreSessionNotes,
   PostSessionNotes,
+  CarTemplate,
   ChecklistNote,
   Op
 };
