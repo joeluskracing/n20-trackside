@@ -429,7 +429,6 @@ const Garage = () => {
           <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
         )}
         <p className="tip">Double click the title to edit.</p>
-        <button className="submit-button" onClick={handleSubmit} disabled={parts.length === 0}>Submit</button>
         <div className="search-controls">
           <input
             type="text"
