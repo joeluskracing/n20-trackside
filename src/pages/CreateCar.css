@@ -1,10 +1,13 @@
 /* src/pages/CreateCar.css */
 
 .create-car {
-    padding: 2rem;
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: var(--surface-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
   
   .create-car h2 {
     margin-top: 0;
@@ -23,21 +26,13 @@
   
   .create-car input {
     padding: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
   }
   
   .create-car button {
     padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
   }
   
   .create-car button:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-dark);
   }
   

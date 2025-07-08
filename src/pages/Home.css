@@ -8,10 +8,10 @@
 }
 
 .grid-box {
-  background-color: #f8f9fa;
+  background-color: var(--surface-color);
   padding: 1rem;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .grid-box h2 {
@@ -26,23 +26,15 @@
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
 }
 
 .grid-box button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
 .grid-box button:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-dark);
 }
 
 .make-default-button {
