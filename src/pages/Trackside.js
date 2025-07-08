@@ -90,7 +90,9 @@ const Trackside = () => {
   const loadEvents = async () => {
     try {
       const fetchedEvents = await window.api.getEventsWithSessions();
-      const filteredEvents = fetchedEvents.filter(event => event.carId == carId && event.trackId !== 1); // 1 is the ID for the "Garage" track
+      const filteredEvents = fetchedEvents
+        .filter(event => event.carId == carId && event.trackId !== 1)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
       setEvents(filteredEvents);
     } catch (error) {
       console.error('Error loading events:', error);
