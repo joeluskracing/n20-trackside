@@ -294,6 +294,11 @@ const ChecklistNote = sequelize.define('ChecklistNote', {
   content: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  orderIndex: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
 }, {
   timestamps: true
