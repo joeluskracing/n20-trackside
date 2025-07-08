@@ -64,11 +64,39 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error updating part order:', error);
     }
   },
+  updatePart: async (id, updates) => {
+    try {
+      return await Part.update(updates, { where: { id } });
+    } catch (error) {
+      console.error('Error updating part:', error);
+    }
+  },
   deletePart: async (id) => {
     try {
       return await Part.destroy({ where: { id } });
     } catch (error) {
       console.error('Error deleting part:', error);
+    }
+  },
+  getPartUsage: async (partId) => {
+    try {
+      const spvs = await SessionPartsValues.findAll({ include: [{ model: Session, include: [Event] }] });
+      const usage = [];
+      for (const spv of spvs) {
+        if (spv.values && Object.prototype.hasOwnProperty.call(spv.values, partId)) {
+          if (spv.Session && spv.Session.Event) {
+            usage.push({
+              event: spv.Session.Event.name,
+              date: spv.Session.Event.date,
+              session: spv.Session.name || spv.Session.type
+            });
+          }
+        }
+      }
+      return usage;
+    } catch (error) {
+      console.error('Error fetching part usage:', error);
+      return [];
     }
   },
   addEvent: async (name, date, trackId, carId) => {
