@@ -369,7 +369,7 @@ const Garage = () => {
                 />
               ) : (
                 <button
-                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''} ${event.Sessions.some(s => s.id === currentSessionId) ? 'selected' : ''}`}
+                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
                   onClick={() => handleEventClick(event.id)}
                   onDoubleClick={() => handleEventDoubleClick(event)}
                   onContextMenu={(e) => handleContextMenu(e, event, 'event')}
@@ -383,7 +383,7 @@ const Garage = () => {
                     event.Sessions.map((session, index) => (
                       <li
                         key={index}
-                        className={`session-item ${currentSessionId === session.id ? 'selected' : ''}`}
+                        className="session-item"
                         onDoubleClick={() => handleSessionDoubleClick(session)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
@@ -399,7 +399,11 @@ const Garage = () => {
                         ) : (
                           <>
                             <span>{session.name}</span>
-                            <button className="load-btn" onClick={() => handleLoadSession(session)}>Load</button>
+                            {currentSessionId === session.id ? (
+                              <button className="load-btn" disabled>Loaded</button>
+                            ) : (
+                              <button className="load-btn" onClick={() => handleLoadSession(session)}>Load</button>
+                            )}
                           </>
                         )}
                       </li>
