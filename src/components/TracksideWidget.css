@@ -1,0 +1,35 @@
+.trackside-widget ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.trackside-widget li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.trackside-widget li.selected {
+  color: red;
+  font-weight: bold;
+}
+
+.trackside-widget .create-event {
+  margin-top: 20px;
+}
+
+.trackside-widget .create-event form {
+  display: flex;
+  flex-direction: column;
+}
+
+.trackside-widget .create-event label {
+  margin-bottom: 10px;
+}
+
+.trackside-widget .create-event input {
+  margin-bottom: 5px;
+}
+
+.trackside-widget.expand {
+  grid-row: span 2;
+}

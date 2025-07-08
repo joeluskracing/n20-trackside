@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
+import TracksideWidget from '../components/TracksideWidget';
 
 const Home = () => {
   const { cars, selectedCar, setSelectedCar, loadCars } = useCar();
@@ -141,6 +142,7 @@ const Home = () => {
           </div>
         )}
       </div>
+      <TracksideWidget />
     </div>
   );
 };
