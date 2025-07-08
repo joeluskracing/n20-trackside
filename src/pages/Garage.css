@@ -109,6 +109,40 @@ button:hover {
   border-radius: 4px;
 }
 
+.accordion-button {
+  width: 100%;
+  text-align: left;
+  background-color: #e0e0e0;
+  border: none;
+  padding: 0.5rem 1rem;
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1.1em;
+}
+
+.accordion-button::after {
+  content: '\25BC';
+  position: absolute;
+  right: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.accordion-button.expanded::after {
+  transform: rotate(-180deg);
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.load-btn {
+  margin-left: 0.5rem;
+}
+
 .tip {
   font-size: 0.85rem;
   color: #555;
