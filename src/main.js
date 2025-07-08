@@ -1,17 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const {
-  Car,
-  Track,
-  Part,
-  Event,
-  Session,
-  PartsValues,
-  SessionPartsValues,
-  PreSessionNotes,
-  PostSessionNotes
-} = require('./database');
+// Models will be required lazily inside handlers to avoid reference issues
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -43,6 +33,18 @@ app.on('activate', () => {
 
 ipcMain.handle('export-car-data', async (event, carId) => {
   try {
+    const {
+      Car,
+      Track,
+      Part,
+      Event,
+      Session,
+      PartsValues,
+      SessionPartsValues,
+      PreSessionNotes,
+      PostSessionNotes
+    } = require('./database');
+
     const car = await Car.findByPk(carId, {
       include: [
         { model: Part, include: [PartsValues] },
