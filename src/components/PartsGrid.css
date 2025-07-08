@@ -22,6 +22,26 @@
   margin-bottom: 10px;
 }
 
+.part-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.part-name {
+  flex: 1;
+}
+
+.part-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .grid-cell.placeholder {
   visibility: hidden;
   border: 1px solid transparent;
