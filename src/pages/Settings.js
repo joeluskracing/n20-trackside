@@ -83,7 +83,7 @@ const Settings = () => {
       <div className="left-column">
         <h2>Settings</h2>
         <button
-          className={activeTab === 'notes' ? 'active' : ''}
+          className={`nav-button ${activeTab === 'notes' ? 'active' : ''}`}
           onClick={() => setActiveTab('notes')}
         >
           Session Notes
