@@ -81,6 +81,12 @@ const Trackside = () => {
     }
   }, [currentSession]);
 
+  useEffect(() => {
+    if (!currentSession && sessions.length > 0) {
+      setCurrentSession(sessions[0].id);
+    }
+  }, [sessions]);
+
   const loadEvents = async () => {
     try {
       const fetchedEvents = await window.api.getEventsWithSessions();
@@ -426,6 +432,7 @@ const Trackside = () => {
             <button className="end-event" onClick={handleEndEvent}>End Event</button>
           </div>
           <div className="right-column">
+            <h2>{sessions.find(s => s.id == currentSession)?.name || ''}</h2>
             <div className="notes-columns">
               <div className="box pre-notes">
                 <h2>Pre-Session Notes</h2>
