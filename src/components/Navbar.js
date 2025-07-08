@@ -17,6 +17,9 @@ const Navbar = () => {
           <NavLink to="/trackside" className={({ isActive }) => (isActive ? 'active' : '')}>Trackside</NavLink>
         </li>
         <li className="navbar-item">
+          <NavLink to="/checklist" className={({ isActive }) => (isActive ? 'active' : '')}>Checklist</NavLink>
+        </li>
+        <li className="navbar-item">
           <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>Settings</NavLink>
         </li>
       </ul>
