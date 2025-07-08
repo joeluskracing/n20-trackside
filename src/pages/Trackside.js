@@ -265,6 +265,11 @@ const Trackside = () => {
   };
 
   const toggleForm = () => {
+    // Reset sessions when opening the form to avoid duplicates from a previous event
+    if (!showForm) {
+      setSessions([]);
+      setSelectedSessions(['Practice', 'Heat', 'Feature']);
+    }
     setShowForm(!showForm);
   };
 
@@ -279,6 +284,7 @@ const Trackside = () => {
   const handleEndEvent = () => {
     setCurrentEvent(null);
     setCurrentSession(null);
+    setSessions([]); // Clear previous sessions to avoid duplicates when creating a new event
     loadEvents(); // Refresh the events list
   };
 
