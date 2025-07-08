@@ -92,8 +92,10 @@ const Settings = () => {
       <div className="right-column">
         {activeTab === 'notes' && (
           <>
-            {renderFields(preFields, 'pre')}
-            {renderFields(postFields, 'post')}
+            <div className="notes-columns">
+              {renderFields(preFields, 'pre')}
+              {renderFields(postFields, 'post')}
+            </div>
             <button onClick={handleSave}>Save Templates</button>
           </>
         )}
