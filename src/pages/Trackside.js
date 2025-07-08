@@ -476,7 +476,7 @@ const Trackside = () => {
           </div>
         </div>
       ) : (
-        <> 
+        <div className="trackside-events-wrapper">
           <h2>Trackside Events</h2>
           <button className="create-event-button" onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
           {events.length > 0 ? (
@@ -578,7 +578,7 @@ const Trackside = () => {
               </form>
             </div>
           )}
-        </>
+        </div>
       )}
       {showTableLightbox && (
         <div className="lightbox">
