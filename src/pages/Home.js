@@ -3,6 +3,7 @@ import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
 import TracksideWidget from '../components/TracksideWidget';
+import StatsWidget from '../components/StatsWidget';
 
 const Home = () => {
   const { cars, selectedCar, setSelectedCar, loadCars } = useCar();
@@ -143,6 +144,7 @@ const Home = () => {
         </div>
       </div>
       <TracksideWidget />
+      <StatsWidget />
     </div>
   );
 };

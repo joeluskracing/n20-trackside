@@ -340,6 +340,82 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error deleting session parts values:', error);
     }
   },
+  getStatsByYear: async (carId) => {
+    try {
+      const events = await Event.findAll({
+        where: { carId, trackId: { [Op.ne]: 1 } },
+        include: [{
+          model: Session,
+          as: 'Sessions',
+          include: [PreSessionNotes, PostSessionNotes]
+        }]
+      });
+
+      const stats = {};
+      for (const event of events) {
+        const year = new Date(event.date).getFullYear();
+        if (!stats[year]) {
+          stats[year] = {
+            bestFeatureFinish: null,
+            featureTopFives: 0,
+            featureTopTens: 0,
+            bestImprovement: null,
+            totalFinish: 0,
+            featureCount: 0,
+            heatWins: 0
+          };
+        }
+
+        for (const session of event.Sessions) {
+          const pre = session.PreSessionNotes?.[0]?.notes || [];
+          const post = session.PostSessionNotes?.[0]?.notes || [];
+          const startNote = pre.find(n => n.title === 'Starting Position');
+          const finishNote = post.find(n => n.title === 'Finishing Position');
+          const startPos = startNote ? parseInt(startNote.value) : NaN;
+          const finishPos = finishNote ? parseInt(finishNote.value) : NaN;
+          const name = (session.name || '').toLowerCase();
+
+          if (name.includes('feature')) {
+            if (!isNaN(finishPos)) {
+              if (stats[year].bestFeatureFinish === null || finishPos < stats[year].bestFeatureFinish) {
+                stats[year].bestFeatureFinish = finishPos;
+              }
+              if (finishPos <= 5) stats[year].featureTopFives++;
+              if (finishPos <= 10) stats[year].featureTopTens++;
+              stats[year].totalFinish += finishPos;
+              stats[year].featureCount++;
+            }
+            if (!isNaN(startPos) && !isNaN(finishPos)) {
+              const improvement = startPos - finishPos;
+              if (stats[year].bestImprovement === null || improvement > stats[year].bestImprovement) {
+                stats[year].bestImprovement = improvement;
+              }
+            }
+          } else if (name.includes('heat')) {
+            if (!isNaN(finishPos) && finishPos === 1) {
+              stats[year].heatWins++;
+            }
+          }
+        }
+      }
+
+      for (const year of Object.keys(stats)) {
+        const s = stats[year];
+        if (s.featureCount > 0) {
+          s.averageFinish = parseFloat((s.totalFinish / s.featureCount).toFixed(2));
+        } else {
+          s.averageFinish = null;
+        }
+        delete s.totalFinish;
+        delete s.featureCount;
+      }
+
+      return stats;
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+      return {};
+    }
+  },
   exportCarData: async (carId) => {
     try {
       return await ipcRenderer.invoke('export-car-data', carId);
