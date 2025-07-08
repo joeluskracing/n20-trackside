@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes, ChecklistNote, CarTemplate} = require('./database');
+const { Sequelize, Op, Car, Track, Part, Event, EventInfo, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes, ChecklistNote, CarTemplate} = require('./database');
 const fs = require('fs');
 const path = require('path');
 
@@ -251,6 +251,33 @@ contextBridge.exposeInMainWorld('api', {
       await Event.update({ name: newName }, { where: { id: eventId } });
     } catch (error) {
       console.error('Error updating event name:', error);
+    }
+  },
+  updateEvent: async (eventId, data) => {
+    try {
+      await Event.update(data, { where: { id: eventId } });
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  },
+  getEventInfo: async (eventId) => {
+    try {
+      const info = await EventInfo.findOne({ where: { eventId } });
+      return info ? info.toJSON() : null;
+    } catch (error) {
+      console.error('Error fetching event info:', error);
+    }
+  },
+  updateEventInfo: async (eventId, temperature, humidity, notes) => {
+    try {
+      const existing = await EventInfo.findOne({ where: { eventId } });
+      if (existing) {
+        await EventInfo.update({ temperature, humidity, notes }, { where: { eventId } });
+      } else {
+        await EventInfo.create({ eventId, temperature, humidity, notes });
+      }
+    } catch (error) {
+      console.error('Error updating event info:', error);
     }
   },
   updateSessionName: async (sessionId, newName) => {
