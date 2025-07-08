@@ -181,8 +181,8 @@ button:hover {
 .bottom-bar {
   position: fixed;
   bottom: 0;
-  left: 25%;
-  width: 75%;
+  left: calc(25% + 1rem);
+  width: calc(75% - 2rem);
   height: 90px;
   background-color: #fff;
   border: 1px solid #ddd;
