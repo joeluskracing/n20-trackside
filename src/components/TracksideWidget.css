@@ -1,7 +1,16 @@
 
 
+
 .trackside-widget .create-event {
   margin-top: 20px;
+}
+
+/* Remove horizontal margins inherited from .grid-box buttons so
+   event buttons align flush with the widget edges */
+.trackside-widget .event-button,
+.trackside-widget .create-event-button {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .trackside-widget .create-event form {
