@@ -434,11 +434,17 @@ const Trackside = () => {
             <button onClick={handleEndEvent}>End Event</button>
           </div>
           <div className="right-column">
-            <div className="box">
-              <h2>Pre-Session Notes</h2>
-              {renderNotesForm(preSessionNotes, setPreSessionNotes)}
+            <div className="notes-columns">
+              <div className="box pre-notes">
+                <h2>Pre-Session Notes</h2>
+                {renderNotesForm(preSessionNotes, setPreSessionNotes)}
+              </div>
+              <div className="box post-notes">
+                <h2>Post-Session Notes</h2>
+                {renderNotesForm(postSessionNotes, setPostSessionNotes)}
+              </div>
             </div>
-            <div className="box">
+            <div className="box setup-box">
               <h2>Setup</h2>
               <div className="search-controls">
                 <input
@@ -471,10 +477,6 @@ const Trackside = () => {
                 showAll={showAll}
                 searchTerm={searchTerm}
               />
-            </div>
-            <div className="box">
-              <h2>Post-Session Notes</h2>
-              {renderNotesForm(postSessionNotes, setPostSessionNotes)}
             </div>
             <button className="save-notes" onClick={handleSetupSubmit}>Save Notes</button>
           </div>
