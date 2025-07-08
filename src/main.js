@@ -53,6 +53,7 @@ ipcMain.handle('export-car-data', async (event, carId) => {
             {
               model: Session,
               as: 'Sessions',
+              attributes: { exclude: ['lastSelected'] },
               include: [SessionPartsValues, PreSessionNotes, PostSessionNotes]
             }
           ]
