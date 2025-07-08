@@ -67,3 +67,23 @@
 .nav-button.active {
   background-color: var(--primary-dark);
 }
+
+.template-list,
+.car-list {
+  margin-bottom: 1rem;
+  background-color: var(--surface-color);
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.template-list ul,
+.car-list ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.car-list button {
+  margin-left: 0.5rem;
+}
+

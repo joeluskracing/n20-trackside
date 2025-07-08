@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes } = require('./database');
+const { Sequelize, Op, Car, Track, Part, Event, Session, PartsValues, SessionPartsValues, NotesTemplate, PreSessionNotes, PostSessionNotes, CarTemplate } = require('./database');
 const fs = require('fs');
 const path = require('path');
 
@@ -331,6 +331,43 @@ contextBridge.exposeInMainWorld('api', {
       }
     } catch (error) {
       console.error('Error updating notes template:', error);
+    }
+  },
+  getCarTemplates: async () => {
+    try {
+      const templates = await CarTemplate.findAll();
+      return templates.map(t => t.toJSON());
+    } catch (error) {
+      console.error('Error fetching car templates:', error);
+      return [];
+    }
+  },
+  addCarTemplate: async (carId, name) => {
+    try {
+      const parts = await Part.findAll({ where: { carId } });
+      const partsData = parts.map(p => ({
+        name: p.name,
+        unit: p.unit,
+        entryType: p.entryType,
+        displayLocation: p.displayLocation,
+        subheading: p.subheading,
+        order: p.order
+      }));
+      const tmpl = await CarTemplate.create({ carId, name, parts: partsData });
+      return tmpl.toJSON();
+    } catch (error) {
+      console.error('Error adding car template:', error);
+    }
+  },
+  applyTemplateToCar: async (templateId, carId) => {
+    try {
+      const tmpl = await CarTemplate.findByPk(templateId);
+      if (!tmpl) return;
+      for (const part of tmpl.parts || []) {
+        await Part.create({ ...part, carId });
+      }
+    } catch (error) {
+      console.error('Error applying template to car:', error);
     }
   },
   deleteSessionPartsValuesBySessionId: async (sessionId) => {

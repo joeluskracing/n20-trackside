@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import './Settings.css';
+import { useCar } from '../context/CarContext';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('notes');
   const [preFields, setPreFields] = useState([]);
   const [postFields, setPostFields] = useState([]);
+  const [carTemplates, setCarTemplates] = useState([]);
+  const { cars, loadCars } = useCar();
+
+  const loadCarTemplates = async () => {
+    const t = await window.api.getCarTemplates();
+    setCarTemplates(t);
+  };
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -15,6 +23,8 @@ const Settings = () => {
       setPostFields(post ? post.fields : []);
     };
     loadTemplates();
+    loadCarTemplates();
+    loadCars();
   }, []);
 
   const handleAddField = (type) => {
@@ -53,6 +63,13 @@ const Settings = () => {
     alert('Notes templates saved');
   };
 
+  const handleSaveTemplate = async (carId) => {
+    const name = prompt('Template Name?');
+    if (!name) return;
+    await window.api.addCarTemplate(carId, name);
+    loadCarTemplates();
+  };
+
   const renderFields = (fields, type) => (
     <div className="template-section">
       <h3>{type === 'pre' ? 'Pre-Session Notes' : 'Post-Session Notes'}</h3>
@@ -88,6 +105,12 @@ const Settings = () => {
         >
           Session Notes
         </button>
+        <button
+          className={`nav-button ${activeTab === 'templates' ? 'active' : ''}`}
+          onClick={() => setActiveTab('templates')}
+        >
+          Template Car
+        </button>
       </div>
       <div className="right-column">
         {activeTab === 'notes' && (
@@ -97,6 +120,28 @@ const Settings = () => {
               {renderFields(postFields, 'post')}
             </div>
             <button onClick={handleSave}>Save Templates</button>
+          </>
+        )}
+        {activeTab === 'templates' && (
+          <>
+            <div className="template-list">
+              <h3>Saved Templates</h3>
+              <ul>
+                {carTemplates.map(t => (
+                  <li key={t.id}>{t.name} - {new Date(t.createdAt).toLocaleDateString()}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="car-list">
+              <h3>Your Cars</h3>
+              <ul>
+                {cars.map(c => (
+                  <li key={c.id}>
+                    {c.name} <button onClick={() => handleSaveTemplate(c.id)}>Save as Template</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </>
         )}
       </div>
