@@ -170,10 +170,10 @@ const TracksideWidget = () => {
   };
 
   const isEventRunning = (event) => {
-    const created = new Date(event.createdAt);
+    const eventDate = new Date(event.date);
     const now = new Date();
-    const diff = Math.abs(now - created);
-    return diff <= 6 * 60 * 60 * 1000 && created.toDateString() === now.toDateString();
+    const diff = Math.abs(now - eventDate);
+    return diff <= 6 * 60 * 60 * 1000 && eventDate.toDateString() === now.toDateString();
   };
 
   return (
