@@ -233,15 +233,19 @@ contextBridge.exposeInMainWorld('api', {
   },
   deleteEvent: async (eventId) => {
     try {
+      console.debug('preload: deleting event', eventId);
       await Event.destroy({ where: { id: eventId } });
+      console.debug('preload: event deleted');
     } catch (error) {
       console.error('Error deleting event:', error);
     }
   },
   deleteSession: async (sessionId) => {
     try {
+      console.debug('preload: deleting session', sessionId);
       await SessionPartsValues.destroy({ where: { sessionId: sessionId } });
       await Session.destroy({ where: { id: sessionId } });
+      console.debug('preload: session deleted');
     } catch (error) {
       console.error('Error deleting session:', error);
     }

@@ -133,7 +133,7 @@ const TracksideWidget = () => {
     event.preventDefault();
     contextMenu.show({
       id: 'event-menu',
-      event,
+      event: event.nativeEvent || event,
       props: { item }
     });
   };
@@ -143,7 +143,9 @@ const TracksideWidget = () => {
     setModalCallback(async (confirm) => {
       if (confirm) {
         try {
+          console.debug('Deleting event with id:', props.item.id);
           await window.api.deleteEvent(props.item.id);
+          console.debug('Event deleted, reloading events');
           loadEvents();
         } catch (error) {
           console.error('Error deleting event:', error);
@@ -158,9 +160,18 @@ const TracksideWidget = () => {
   };
 
   const handleModalOption = async (option) => {
+    console.debug('Modal option selected:', option);
+    const cb = modalCallback;
+    const hasCallback = Boolean(cb);
+    console.debug('Has modal callback:', hasCallback);
     closeModal();
-    if (modalCallback) {
-      await modalCallback(option);
+    if (hasCallback) {
+      try {
+        await cb(option);
+        console.debug('Modal callback finished');
+      } catch (error) {
+        console.error('Error in modal callback:', error);
+      }
     }
   };
 
