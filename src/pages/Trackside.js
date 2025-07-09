@@ -356,6 +356,14 @@ const Trackside = () => {
     setShowTableLightbox(true);
   };
 
+  const handleBringSetupToGarage = () => {
+    localStorage.setItem('garageSetupValues', JSON.stringify(values));
+    if (currentEvent) {
+      localStorage.setItem('garageSetupTitle', `Setup from ${currentEvent.name}`);
+    }
+    navigate('/garage');
+  };
+
   const handleTabDragStart = (index) => {
     setDraggedTabIndex(index);
   };
@@ -655,6 +663,7 @@ const Trackside = () => {
             </div>
             <div className="box setup-box">
               <h2>Setup</h2>
+              <button className="bring-garage" onClick={handleBringSetupToGarage}>Bring Setup To Garage</button>
               <div className="search-controls">
                 <input
                   type="text"
