@@ -87,3 +87,27 @@
   margin-left: 0.5rem;
 }
 
+.track-list {
+  margin-bottom: 1rem;
+  background-color: var(--surface-color);
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.track-list ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.track-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.track-thumb {
+  max-height: 40px;
+  margin: 0 10px;
+}
+

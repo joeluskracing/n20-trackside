@@ -7,11 +7,17 @@ const Settings = () => {
   const [preFields, setPreFields] = useState([]);
   const [postFields, setPostFields] = useState([]);
   const [carTemplates, setCarTemplates] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const { cars, loadCars } = useCar();
 
   const loadCarTemplates = async () => {
     const t = await window.api.getCarTemplates();
     setCarTemplates(t);
+  };
+
+  const loadTracks = async () => {
+    const t = await window.api.getTracks();
+    setTracks(t.filter(tr => tr.id !== 1));
   };
 
   useEffect(() => {
@@ -25,6 +31,7 @@ const Settings = () => {
     loadTemplates();
     loadCarTemplates();
     loadCars();
+    loadTracks();
   }, []);
 
   const handleAddField = (type) => {
@@ -70,6 +77,18 @@ const Settings = () => {
     loadCarTemplates();
   };
 
+  const handlePhotoUpload = (trackId, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result;
+      await window.api.updateTrackPhoto(trackId, dataUrl);
+      setTracks(tracks.map(t => t.id === trackId ? { ...t, photo: dataUrl } : t));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const renderFields = (fields, type) => (
     <div className="template-section">
       <h3>{type === 'pre' ? 'Pre-Session Notes' : 'Post-Session Notes'}</h3>
@@ -111,6 +130,12 @@ const Settings = () => {
         >
           Template Car
         </button>
+        <button
+          className={`nav-button ${activeTab === 'tracks' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tracks')}
+        >
+          Tracks
+        </button>
       </div>
       <div className="right-column">
         {activeTab === 'notes' && (
@@ -143,6 +168,27 @@ const Settings = () => {
               </ul>
             </div>
           </>
+        )}
+        {activeTab === 'tracks' && (
+          <div className="track-list">
+            <h3>Track Photos</h3>
+            <ul>
+              {tracks.map(t => (
+                <li key={t.id}>
+                  {t.name}
+                  {t.photo && <img src={t.photo} alt={t.name} className="track-thumb" />}
+                  <button onClick={() => document.getElementById(`track-photo-${t.id}`).click()}>Upload Photo</button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id={`track-photo-${t.id}`}
+                    style={{ display: 'none' }}
+                    onChange={(e) => handlePhotoUpload(t.id, e)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </div>

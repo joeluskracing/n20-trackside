@@ -295,12 +295,19 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error fetching tracks:', error);
     }
   },
-  addTrack: async (name) => {
+  addTrack: async (name, photo = null) => {
     try {
-      const track = await Track.create({ name });
+      const track = await Track.create({ name, photo });
       return track.toJSON();
     } catch (error) {
       console.error('Error adding track:', error);
+    }
+  },
+  updateTrackPhoto: async (trackId, photo) => {
+    try {
+      await Track.update({ photo }, { where: { id: trackId } });
+    } catch (error) {
+      console.error('Error updating track photo:', error);
     }
   },
   getSession: async (sessionId) => {
