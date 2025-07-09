@@ -204,6 +204,7 @@ const ManageParts = () => {
             <div className="checkbox-group">
               {locationOptions.map(loc => (
                 <div key={loc}>
+                  <label>{loc}</label>
                   <input
                     type="checkbox"
                     value={loc}
@@ -216,7 +217,6 @@ const ManageParts = () => {
                       )
                     }
                   />
-                  <label>{loc}</label>
                 </div>
               ))}
             </div>
