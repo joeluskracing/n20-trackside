@@ -349,7 +349,7 @@ const Garage = () => {
   const handleModalOption = async (option) => {
     closeModal();
     if (modalCallback) {
-      await modalCallback(option)();
+      await modalCallback(option);
     }
   };
 
