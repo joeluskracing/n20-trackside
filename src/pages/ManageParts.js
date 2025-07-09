@@ -10,6 +10,9 @@ const gridLayout = [
   ["Bottom Left", "Bottom Middle", "Bottom Right"],
 ];
 
+// Flattened list of all locations used for the checkbox form
+const locationOptions = gridLayout.flat();
+
 const ManageParts = () => {
   const { state } = useLocation();
   const { carId, carName } = state || {};
@@ -199,9 +202,20 @@ const ManageParts = () => {
           <label className="form-label">
             Display Location
             <div className="checkbox-group">
-              {['LF','RF','LR','RR'].map(loc => (
+              {locationOptions.map(loc => (
                 <div key={loc}>
-                  <input type="checkbox" value={loc} checked={displayLocation.includes(loc)} onChange={e => setDisplayLocation(prev => e.target.checked ? [...prev, loc] : prev.filter(l => l!==loc))} />
+                  <input
+                    type="checkbox"
+                    value={loc}
+                    checked={displayLocation.includes(loc)}
+                    onChange={e =>
+                      setDisplayLocation(prev =>
+                        e.target.checked
+                          ? [...prev, loc]
+                          : prev.filter(l => l !== loc)
+                      )
+                    }
+                  />
                   <label>{loc}</label>
                 </div>
               ))}
