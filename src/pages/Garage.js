@@ -278,7 +278,7 @@ const Garage = () => {
     e.preventDefault();
     contextMenu.show({
       id: type === 'event' ? 'event-menu' : 'session-menu',
-      event: e,
+      event: e.nativeEvent || e,
       props: { item }
     });
   };

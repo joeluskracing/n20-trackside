@@ -133,7 +133,7 @@ const TracksideWidget = () => {
     event.preventDefault();
     contextMenu.show({
       id: 'event-menu',
-      event,
+      event: event.nativeEvent || event,
       props: { item }
     });
   };
