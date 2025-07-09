@@ -324,7 +324,7 @@ const Trackside = () => {
     event.preventDefault();
     contextMenu.show({
       id: 'event-menu',
-      event,
+      event: event.nativeEvent || event,
       props: { item }
     });
   };
@@ -456,7 +456,7 @@ const Trackside = () => {
     e.preventDefault();
     contextMenu.show({
       id: 'session-menu',
-      event: e,
+      event: e.nativeEvent || e,
       props: { session }
     });
   };
