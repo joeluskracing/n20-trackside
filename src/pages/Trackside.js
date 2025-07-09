@@ -50,6 +50,10 @@ const Trackside = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
+  const [showLoadModal, setShowLoadModal] = useState(false);
+  const [eventSetups, setEventSetups] = useState([]);
+  const [garageEvents, setGarageEvents] = useState([]);
+  const [expandedGarageEvent, setExpandedGarageEvent] = useState(null);
   const [preTemplate, setPreTemplate] = useState([]);
   const [postTemplate, setPostTemplate] = useState([]);
   const [eventInfo, setEventInfo] = useState({ temperature: '', humidity: '', notes: '' });
@@ -378,6 +382,59 @@ const Trackside = () => {
     navigate('/garage');
   };
 
+  const loadEventSetups = async () => {
+    if (!currentEvent) return;
+    try {
+      const sess = await window.api.getSessions(currentEvent.id);
+      const saved = [];
+      for (const s of sess) {
+        const spv = await window.api.getSessionPartsValuesBySessionId(s.id);
+        if (spv) saved.push(s);
+      }
+      setEventSetups(saved);
+    } catch (err) {
+      console.error('Error loading event setups:', err);
+    }
+  };
+
+  const loadGarageSetups = async () => {
+    if (!carId) return;
+    try {
+      const events = await window.api.getEventsWithSessions();
+      const garage = events.filter(e => e.carId == carId && e.trackId == 1);
+      const result = [];
+      for (const ev of garage) {
+        const sessionsList = [];
+        for (const s of ev.Sessions || []) {
+          const spv = await window.api.getSessionPartsValuesBySessionId(s.id);
+          if (spv) sessionsList.push(s);
+        }
+        if (sessionsList.length > 0) result.push({ ...ev, Sessions: sessionsList });
+      }
+      setGarageEvents(result);
+    } catch (err) {
+      console.error('Error loading garage setups:', err);
+    }
+  };
+
+  const openLoadModal = () => {
+    setShowLoadModal(true);
+    loadEventSetups();
+    loadGarageSetups();
+  };
+
+  const handleLoadSetup = async (sessionId) => {
+    try {
+      const spv = await window.api.getSessionPartsValuesBySessionId(sessionId);
+      if (spv) {
+        setValues(spv.values);
+        setShowLoadModal(false);
+      }
+    } catch (err) {
+      console.error('Error loading setup:', err);
+    }
+  };
+
   const handleTabDragStart = (index) => {
     setDraggedTabIndex(index);
   };
@@ -696,6 +753,7 @@ const Trackside = () => {
             <div className="box setup-box">
               <h2>Setup</h2>
               <button className="bring-garage" onClick={handleBringSetupToGarage}>Bring Setup To Garage</button>
+              <button className="load-setup" onClick={openLoadModal}>Load Setup</button>
               <div className="search-controls">
                 <input
                   type="text"
@@ -850,6 +908,56 @@ const Trackside = () => {
           </div>
         </div>
       )}
+      <Modal
+        isOpen={showLoadModal}
+        onRequestClose={() => setShowLoadModal(false)}
+        contentLabel="Load Setup"
+        className="modal"
+        overlayClassName="overlay"
+      >
+        <h2>Load Setup</h2>
+        <div className="load-section">
+          <h3>From This Event</h3>
+          {eventSetups.length > 0 ? (
+            eventSetups.map((sess) => (
+              <div key={sess.id} className="session-item">
+                <span>{sess.name || sess.type}</span>
+                <button className="load-btn" onClick={() => handleLoadSetup(sess.id)}>Load</button>
+              </div>
+            ))
+          ) : (
+            <p>No saved setups.</p>
+          )}
+        </div>
+        <div className="load-section">
+          <h3>Setup Garage</h3>
+          {garageEvents.length > 0 ? (
+            garageEvents.map((ev) => (
+              <div key={ev.id} className="event-group">
+                <button
+                  className={`accordion-button ${expandedGarageEvent === ev.id ? 'expanded' : ''}`}
+                  onClick={() => setExpandedGarageEvent(expandedGarageEvent === ev.id ? null : ev.id)}
+                >
+                  {ev.name}
+                </button>
+                {expandedGarageEvent === ev.id && (
+                  <ul>
+                    {ev.Sessions.map((s) => (
+                      <li key={s.id} className="session-item">
+                        <span>{s.name}</span>
+                        <button className="load-btn" onClick={() => handleLoadSetup(s.id)}>Load</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No garage setups available.</p>
+          )}
+        </div>
+        <button onClick={() => setShowLoadModal(false)}>Close</button>
+      </Modal>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
