@@ -335,7 +335,9 @@ const Trackside = () => {
     setModalCallback(async (confirm) => {
       if (confirm) {
         try {
+          console.debug('Deleting event with id:', props.item.id);
           await window.api.deleteEvent(props.item.id);
+          console.debug('Event deleted, reloading events');
           loadEvents();
         } catch (error) {
           console.error('Error deleting event:', error);
@@ -351,9 +353,17 @@ const Trackside = () => {
   };
 
   const handleModalOption = async (option) => {
+    console.debug('Modal option selected:', option);
+    const hasCallback = Boolean(modalCallback);
+    console.debug('Has modal callback:', hasCallback);
     closeModal();
-    if (modalCallback) {
-      await modalCallback(option);
+    if (hasCallback) {
+      try {
+        await modalCallback(option);
+        console.debug('Modal callback finished');
+      } catch (error) {
+        console.error('Error in modal callback:', error);
+      }
     }
   };
 
@@ -475,7 +485,9 @@ const Trackside = () => {
           if (currentSession === props.session.id) {
             setCurrentSession(null);
           }
+          console.debug('Deleting session with id:', props.session.id);
           await window.api.deleteSession(props.session.id);
+          console.debug('Session deleted, reloading sessions');
           await loadSessions(currentEvent.id);
         } catch (error) {
           console.error('Error deleting session:', error);
