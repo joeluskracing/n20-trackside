@@ -277,6 +277,8 @@ const Trackside = () => {
 
     setCurrentEvent(newEvent);
     setCurrentSession(createdSessions[0]?.id);
+    setPreSessionNotes([]);
+    setPostSessionNotes([]);
     setShowForm(false); // Hide the form after submission
     loadEvents(); // Refresh the events list
   };
@@ -298,9 +300,18 @@ const Trackside = () => {
     setCurrentSession(sessionId);
   };
 
+  const handleSelectEvent = (evt) => {
+    setCurrentEvent(evt);
+    setCurrentSession(null);
+    setPreSessionNotes([]);
+    setPostSessionNotes([]);
+  };
+
   const handleEndEvent = () => {
     setCurrentEvent(null);
     setCurrentSession(null);
+    setPreSessionNotes([]);
+    setPostSessionNotes([]);
     setSessions([]); // Clear previous sessions to avoid duplicates when creating a new event
     loadEvents(); // Refresh the events list
   };
@@ -733,7 +744,7 @@ const Trackside = () => {
                   key={index}
                   className="event-button"
                   style={{ filter: `saturate(${1 - index * 0.1})` }}
-                  onClick={() => setCurrentEvent(event)}
+                  onClick={() => handleSelectEvent(event)}
                   onContextMenu={(e) => handleContextMenu(e, event)}
                 >
                   <span className="event-title">{event.name}</span>
