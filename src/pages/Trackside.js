@@ -912,7 +912,7 @@ const Trackside = () => {
         isOpen={showLoadModal}
         onRequestClose={() => setShowLoadModal(false)}
         contentLabel="Load Setup"
-        className="modal"
+        className="modal load-setup-modal"
         overlayClassName="overlay"
       >
         <h2>Load Setup</h2>

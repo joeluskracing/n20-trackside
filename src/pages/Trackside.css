@@ -342,3 +342,7 @@ li {
 .load-section {
   margin-bottom: 1rem;
 }
+
+.load-setup-modal {
+  width: 25%;
+}
