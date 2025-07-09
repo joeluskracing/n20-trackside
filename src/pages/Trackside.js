@@ -352,7 +352,7 @@ const Trackside = () => {
     setModalMessage('');
   };
 
-  const handleModalOption = async (option) => {
+const handleModalOption = async (option) => {
     console.debug('Modal option selected:', option);
     const cb = modalCallback;
     const hasCallback = Boolean(cb);
@@ -367,7 +367,6 @@ const Trackside = () => {
       }
     }
   };
-
   const handleChange = (partId, value) => {
     setValues({ ...values, [partId]: value });
   };
