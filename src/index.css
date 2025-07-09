@@ -69,7 +69,8 @@ input:focus, select:focus, textarea:focus {
   position: absolute;
   inset: 0;
   background-image: var(--track-photo);
-  background-size: cover;
+  background-size: 50% auto;
+  background-repeat: no-repeat;
   background-position: center;
   filter: grayscale(100%);
   opacity: 0.3;
