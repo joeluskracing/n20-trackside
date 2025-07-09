@@ -251,3 +251,15 @@ button:hover {
   font-weight: bold;
   text-align: left;
 }
+
+.event-select-list {
+  list-style: none;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.event-select-list li {
+  margin-bottom: 0.25rem;
+}
