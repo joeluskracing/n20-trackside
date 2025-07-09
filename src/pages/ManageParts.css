@@ -8,6 +8,39 @@
   width: 320px;
 }
 
+.form-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-panel label.form-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-panel input,
+.form-panel select {
+  padding: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-group > div {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group input {
+  margin-right: 0.5rem;
+}
+
 .grid-panel {
   flex: 1;
   position: relative;
