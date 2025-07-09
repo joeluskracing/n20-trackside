@@ -53,11 +53,13 @@
 
 .checkbox-group > div {
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .checkbox-group input {
-  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .staged-parts {

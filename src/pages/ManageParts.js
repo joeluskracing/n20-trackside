@@ -188,6 +188,10 @@ const ManageParts = () => {
         <h2>Add Parts to {carName}</h2>
         <form onSubmit={e => { e.preventDefault(); handleAddPart(); }}>
           <label className="form-label">
+            Subheading
+            <input type="text" value={subheading} onChange={e => setSubheading(e.target.value)} />
+          </label>
+          <label className="form-label">
             Part Name
             <input type="text" value={name} onChange={e => setName(e.target.value)} required />
           </label>
@@ -197,6 +201,16 @@ const ManageParts = () => {
               <option value="text">Text</option>
               <option value="number">Number</option>
               <option value="table">Table</option>
+            </select>
+          </label>
+          <label className="form-label">
+            Unit
+            <select value={unit} onChange={e => setUnit(e.target.value)}>
+              <option value="">Select unit</option>
+              <option value="Pounds">Pounds</option>
+              <option value="Inches">Inches</option>
+              <option value="Degrees">Degrees</option>
+              <option value="Clicks">Clicks</option>
             </select>
           </label>
           <label className="form-label">
@@ -220,20 +234,6 @@ const ManageParts = () => {
                 </div>
               ))}
             </div>
-          </label>
-          <label className="form-label">
-            Subheading
-            <input type="text" value={subheading} onChange={e => setSubheading(e.target.value)} />
-          </label>
-          <label className="form-label">
-            Unit
-            <select value={unit} onChange={e => setUnit(e.target.value)}>
-              <option value="">Select unit</option>
-              <option value="Pounds">Pounds</option>
-              <option value="Inches">Inches</option>
-              <option value="Degrees">Degrees</option>
-              <option value="Clicks">Clicks</option>
-            </select>
           </label>
           <button type="submit">Stage Part</button>
         </form>

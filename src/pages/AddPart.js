@@ -99,6 +99,22 @@ const AddPart = () => {
       >
         <input type="hidden" value={carId} />
         <label className="form-label">
+          Subheading (Optional)
+          <small>Use this to group each setting on each corner. For example, "Shocks" for Compression, Rebound, and Gas Pressure</small>
+          <input
+            type="text"
+            value={subheading}
+            onChange={(e) => setSubheading(e.target.value)}
+            list="subheading-options"
+          />
+          <datalist id="subheading-options">
+            <option value="Springs" />
+            <option value="Shocks" />
+            <option value="Alignment" />
+            <option value="Tires" />
+          </datalist>
+        </label>
+        <label className="form-label">
           Part Name <span className="required">*</span>
           <small>Name is required</small>
           <input
@@ -120,175 +136,6 @@ const AddPart = () => {
           {errors.entryType && <span className="error">{errors.entryType}</span>}
         </label>
         <label className="form-label">
-          Display Location <span className="required">*</span>
-          <small>Where on the setup sheet this part will show up. You can select multiple corners at once to duplicate a part across up to all four corners</small>
-          <div className="checkbox-group">
-            <div>
-              <input
-                type="checkbox"
-                value="LF"
-                checked={displayLocation.includes("LF")}
-                onChange={handleCheckboxChange}
-              />
-              <label>LF</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                value="RF"
-                checked={displayLocation.includes("RF")}
-                onChange={handleCheckboxChange}
-              />
-              <label>RF</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                value="LR"
-                checked={displayLocation.includes("LR")}
-                onChange={handleCheckboxChange}
-              />
-              <label>LR</label>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                value="RR"
-                checked={displayLocation.includes("RR")}
-                onChange={handleCheckboxChange}
-              />
-              <label>RR</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Top Left"
-                checked={displayLocation.includes("Top Left")}
-                onChange={handleRadialChange}
-              />
-              <label>Top Left</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Top Middle"
-                checked={displayLocation.includes("Top Middle")}
-                onChange={handleRadialChange}
-              />
-              <label>Top Middle</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Top Right"
-                checked={displayLocation.includes("Top Right")}
-                onChange={handleRadialChange}
-              />
-              <label>Top Right</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Engine"
-                checked={displayLocation.includes("Engine")}
-                onChange={handleRadialChange}
-              />
-              <label>Engine</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Driver"
-                checked={displayLocation.includes("Driver")}
-                onChange={handleRadialChange}
-              />
-              <label>Driver</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Center"
-                checked={displayLocation.includes("Center")}
-                onChange={handleRadialChange}
-              />
-              <label>Center</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Passenger"
-                checked={displayLocation.includes("Passenger")}
-                onChange={handleRadialChange}
-              />
-              <label>Passenger</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Differential"
-                checked={displayLocation.includes("Differential")}
-                onChange={handleRadialChange}
-              />
-              <label>Differential</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Bottom Left"
-                checked={displayLocation.includes("Bottom Left")}
-                onChange={handleRadialChange}
-              />
-              <label>Bottom Left</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Bottom Middle"
-                checked={displayLocation.includes("Bottom Middle")}
-                onChange={handleRadialChange}
-              />
-              <label>Bottom Middle</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                name="displayLocation"
-                value="Bottom Right"
-                checked={displayLocation.includes("Bottom Right")}
-                onChange={handleRadialChange}
-              />
-              <label>Bottom Right</label>
-            </div>
-          </div>
-          {errors.displayLocation && <span className="error">{errors.displayLocation}</span>}
-        </label>
-        <label className="form-label">
-          Subheading (Optional)
-          <small>Use this to group each setting on each corner. For example, "Shocks" for Compression, Rebound, and Gas Pressure</small>
-          <input
-            type="text"
-            value={subheading}
-            onChange={(e) => setSubheading(e.target.value)}
-            list="subheading-options"
-          />
-          <datalist id="subheading-options">
-            <option value="Springs" />
-            <option value="Shocks" />
-            <option value="Alignment" />
-            <option value="Tires" />
-          </datalist>
-        </label>
-        <label className="form-label">
           Unit (Optional)
           <small>If the option is a number, use unit to display a unit next to the setting</small>
           <select value={unit} onChange={(e) => setUnit(e.target.value)}>
@@ -299,6 +146,159 @@ const AddPart = () => {
             <option value="Degrees">Degrees</option>
             <option value="Clicks">Clicks</option>
           </select>
+        </label>
+        <label className="form-label">
+          Display Location <span className="required">*</span>
+          <small>Where on the setup sheet this part will show up. You can select multiple corners at once to duplicate a part across up to all four corners</small>
+          <div className="checkbox-group">
+            <div>
+              <label>LF</label>
+              <input
+                type="checkbox"
+                value="LF"
+                checked={displayLocation.includes("LF")}
+                onChange={handleCheckboxChange}
+              />
+            </div>
+            <div>
+              <label>RF</label>
+              <input
+                type="checkbox"
+                value="RF"
+                checked={displayLocation.includes("RF")}
+                onChange={handleCheckboxChange}
+              />
+            </div>
+            <div>
+              <label>LR</label>
+              <input
+                type="checkbox"
+                value="LR"
+                checked={displayLocation.includes("LR")}
+                onChange={handleCheckboxChange}
+              />
+            </div>
+            <div>
+              <label>RR</label>
+              <input
+                type="checkbox"
+                value="RR"
+                checked={displayLocation.includes("RR")}
+                onChange={handleCheckboxChange}
+              />
+            </div>
+            <div>
+              <label>Top Left</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Top Left"
+                checked={displayLocation.includes("Top Left")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Top Middle</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Top Middle"
+                checked={displayLocation.includes("Top Middle")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Top Right</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Top Right"
+                checked={displayLocation.includes("Top Right")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Engine</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Engine"
+                checked={displayLocation.includes("Engine")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Driver</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Driver"
+                checked={displayLocation.includes("Driver")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Center</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Center"
+                checked={displayLocation.includes("Center")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Passenger</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Passenger"
+                checked={displayLocation.includes("Passenger")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Differential</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Differential"
+                checked={displayLocation.includes("Differential")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Bottom Left</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Bottom Left"
+                checked={displayLocation.includes("Bottom Left")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Bottom Middle</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Bottom Middle"
+                checked={displayLocation.includes("Bottom Middle")}
+                onChange={handleRadialChange}
+              />
+            </div>
+            <div>
+              <label>Bottom Right</label>
+              <input
+                type="radio"
+                name="displayLocation"
+                value="Bottom Right"
+                checked={displayLocation.includes("Bottom Right")}
+                onChange={handleRadialChange}
+              />
+            </div>
+          </div>
+          {errors.displayLocation && <span className="error">{errors.displayLocation}</span>}
         </label>
         <button type="submit" disabled={!name || !entryType || displayLocation.length === 0}>Stage Changes</button>
       </form>
@@ -317,5 +317,4 @@ const AddPart = () => {
     </div>
   );
 };
-
 export default AddPart;
