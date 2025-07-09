@@ -140,7 +140,7 @@ const TracksideWidget = () => {
 
   const handleDeleteEvent = async ({ props }) => {
     setIsModalOpen(true);
-    setModalCallback(async (confirm) => {
+    setModalCallback(() => async (confirm) => {
       if (confirm) {
         try {
           console.debug('Deleting event with id:', props.item.id);
