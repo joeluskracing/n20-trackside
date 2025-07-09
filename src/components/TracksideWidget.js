@@ -169,24 +169,38 @@ const TracksideWidget = () => {
     navigate('/trackside');
   };
 
+  const isEventRunning = (event) => {
+    const created = new Date(event.createdAt);
+    const now = new Date();
+    const diff = Math.abs(now - created);
+    return diff <= 6 * 60 * 60 * 1000 && created.toDateString() === now.toDateString();
+  };
+
   return (
     <div className={`grid-box trackside-widget ${showForm ? 'expand' : ''}`}>
       <h2>Trackside Events</h2>
       <button className="create-event-button" onClick={toggleForm}>{showForm ? 'Cancel' : 'Create New Event'}</button>
       {events.length > 0 ? (
         <div className="event-list">
-          {events.map((event, index) => (
-            <button
-              key={index}
-              className="event-button"
-              style={{ filter: `saturate(${1 - index * 0.1})` }}
-              onClick={() => handleEventClick(event)}
-              onContextMenu={(e) => handleContextMenu(e, event)}
-            >
-              <span className="event-title">{event.name}</span>
-              <span className="event-date">{new Date(event.date).toLocaleDateString()}</span>
-            </button>
-          ))}
+          {events.map((event, index) => {
+            const track = tracks.find(t => t.id == event.trackId);
+            const running = isEventRunning(event);
+            return (
+              <button
+                key={index}
+                className={`event-button${running ? ' running' : ''}`}
+                style={{
+                  filter: `saturate(${1 - index * 0.1})`,
+                  '--track-photo': track && track.photo ? `url(${track.photo})` : 'none'
+                }}
+                onClick={() => handleEventClick(event)}
+                onContextMenu={(e) => handleContextMenu(e, event)}
+              >
+                <span className="event-title">{event.name}</span>
+                <span className="event-date">{new Date(event.date).toLocaleDateString()}</span>
+              </button>
+            );
+          })}
         </div>
       ) : (
         <p>No trackside events available. Create a new event.</p>

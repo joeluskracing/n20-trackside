@@ -59,12 +59,39 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+.event-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--track-photo);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%);
+  opacity: 0.3;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+}
+
+.event-button.running {
+  border: 2px solid orange;
 }
 
 .create-event-button {
   width: 100%;
   margin-bottom: 0.5rem;
   background-color: #4caf50;
+}
+
+.event-title,
+.event-date {
+  position: relative;
+  z-index: 1;
 }
 
 .event-title {

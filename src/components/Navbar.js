@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import TracksideNotice from './TracksideNotice';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -23,7 +22,6 @@ const Navbar = () => {
           <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>Settings</NavLink>
         </li>
       </ul>
-      <TracksideNotice />
     </nav>
   );
 };
