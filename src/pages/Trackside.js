@@ -77,7 +77,11 @@ const Trackside = () => {
       loadSessions(currentEvent.id);
       setShowForm(false);
       window.api.getEventInfo(currentEvent.id).then(info => {
-        if (info) setEventInfo(info);
+        if (info) {
+          setEventInfo(info);
+        } else {
+          setEventInfo({ temperature: '', humidity: '', notes: '' });
+        }
       });
     }
   }, [currentEvent]);
