@@ -304,11 +304,11 @@ const Trackside = () => {
     loadEvents(); // Refresh the events list
   };
 
-  const handleContextMenu = (e, item) => {
-    e.preventDefault();
+  const handleContextMenu = (event, item) => {
+    event.preventDefault();
     contextMenu.show({
       id: 'event-menu',
-      event: e,
+      event,
       props: { item }
     });
   };

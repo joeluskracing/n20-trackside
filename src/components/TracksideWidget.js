@@ -129,11 +129,11 @@ const TracksideWidget = () => {
   const toggleForm = () => setShowForm(!showForm);
   const toggleCustomSessions = () => setShowCustomSessions(!showCustomSessions);
 
-  const handleContextMenu = (e, item) => {
-    e.preventDefault();
+  const handleContextMenu = (event, item) => {
+    event.preventDefault();
     contextMenu.show({
       id: 'event-menu',
-      event: e,
+      event,
       props: { item }
     });
   };
