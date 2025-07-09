@@ -39,9 +39,8 @@ const Garage = () => {
   const [editingName, setEditingName] = useState('');
   const [sessionTitle, setSessionTitle] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
-  const [eventClickTimer, setEventClickTimer] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalCallback, setModalCallback] = useState(null);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [selectedSaveEventId, setSelectedSaveEventId] = useState(null);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -189,53 +188,32 @@ const Garage = () => {
     setCurrentPart(null);
   };
 
+  const saveToEvent = async (eventId) => {
+    const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
+    await window.api.addSessionPartsValue(newSession.id, values);
+    loadEventsWithSessions();
+    setCurrentSessionId(newSession.id);
+    setSelectedEventId(eventId);
+    toast.success('Setup saved');
+  };
+
+  const createNewEventAndSave = async () => {
+    const garageTrackId = 1;
+    const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date(), garageTrackId, carId);
+    await saveToEvent(newEvent.id);
+  };
+
   const handleSubmit = async () => {
     try {
-      // Update all part values
       for (const partId in values) {
         await window.api.updatePartValue(partId, values[partId]);
       }
 
-      // Check for events in the last 24 hours
-      let eventId;
-      const garageTrackId = 1; // ID of the "Garage" track
-
-      const recentEvents = await window.api.getEventsInLast24Hours();
-      const recentEvent = recentEvents.find(event => event.carId == carId && event.trackId == 1);
-      if (recentEvent) {
-        setIsModalOpen(true);
-        setModalCallback(() => async (option) => {
-          if (option === 'yes') {
-            eventId = recentEvent.id;
-          } else if (option === 'no') {
-            const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date(), garageTrackId, carId);
-            eventId = newEvent.id;
-          }
-          if (eventId) {
-            const existingSessions = await window.api.getSessions(eventId);
-            const sessionCount = existingSessions.length;
-            const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
-            await window.api.addSessionPartsValue(newSession.id, values);
-            loadEventsWithSessions();
-            setCurrentSessionId(newSession.id);
-            setSelectedEventId(eventId);
-            toast.success('Setup saved');
-          }
-        });
+      if (events.length === 0) {
+        await createNewEventAndSave();
       } else {
-        const newEvent = await window.api.addEvent(`Garage session on ${new Date().toISOString().split('T')[0]}`, new Date(), garageTrackId, carId);
-        eventId = newEvent.id;
-      }
-
-      if (!isModalOpen && eventId) {
-        const existingSessions = await window.api.getSessions(eventId);
-        const sessionCount = existingSessions.length;
-        const newSession = await window.api.addSession(eventId, new Date(), 'garage', sessionTitle);
-        await window.api.addSessionPartsValue(newSession.id, values);
-        loadEventsWithSessions();
-        setCurrentSessionId(newSession.id);
-        setSelectedEventId(eventId);
-        toast.success('Setup saved');
+        setSelectedSaveEventId(events[0].id);
+        setIsEventModalOpen(true);
       }
     } catch (error) {
       console.error('Error during submit:', error);
@@ -244,14 +222,7 @@ const Garage = () => {
 
   const handleEventClick = (eventId) => {
     if (editingEventId) return;
-    if (!eventClickTimer) {
-      setEventClickTimer(
-        setTimeout(() => {
-          setSelectedEventId((prev) => (prev === eventId ? null : eventId));
-          setEventClickTimer(null);
-        }, 200)
-      );
-    }
+    setSelectedEventId((prev) => (prev === eventId ? null : eventId));
   };
 
   const handleLoadSession = async (session) => {
@@ -267,19 +238,7 @@ const Garage = () => {
     }
   };
 
-  const handleSessionDoubleClick = (session) => {
-    setEditingSessionId(session.id);
-    setEditingName(session.name);
-  };
 
-  const handleEventDoubleClick = (event) => {
-    if (eventClickTimer) {
-      clearTimeout(eventClickTimer);
-      setEventClickTimer(null);
-    }
-    setEditingEventId(event.id);
-    setEditingName(event.name);
-  };
 
   const handleEditingNameChange = (e) => {
     setEditingName(e.target.value);
@@ -300,7 +259,8 @@ const Garage = () => {
     }
   };
 
-  const handleTitleDoubleClick = () => {
+  const handleTitleContextMenu = (e) => {
+    e.preventDefault();
     setEditingTitle(true);
     setEditingName(sessionTitle);
   };
@@ -341,16 +301,18 @@ const Garage = () => {
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalCallback(null);
+  const handleRenameEvent = ({ props }) => {
+    setEditingEventId(props.item.id);
+    setEditingName(props.item.name);
   };
 
-  const handleModalOption = async (option) => {
-    closeModal();
-    if (modalCallback) {
-      await modalCallback(option);
-    }
+  const handleRenameSession = ({ props }) => {
+    setEditingSessionId(props.item.id);
+    setEditingName(props.item.name);
+  };
+
+  const closeModal = () => {
+    setIsEventModalOpen(false);
   };
 
   const handleShowAll = () => {
@@ -366,7 +328,7 @@ const Garage = () => {
       <ToastContainer />
       <div className="left-column">
         <h2>Garage Mode</h2>
-        <p className="tip">Right click a session to delete it.</p>
+        <p className="tip">Right click an event or session to rename or delete it.</p>
         {events.length > 0 ? (
           events.map((event, index) => (
             <div key={index} className="event-group">
@@ -383,7 +345,6 @@ const Garage = () => {
                 <button
                   className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
                   onClick={() => handleEventClick(event.id)}
-                  onDoubleClick={() => handleEventDoubleClick(event)}
                   onContextMenu={(e) => handleContextMenu(e, event, 'event')}
                 >
                   {event.name}
@@ -396,7 +357,6 @@ const Garage = () => {
                       <li
                         key={index}
                         className="session-item"
-                        onDoubleClick={() => handleSessionDoubleClick(session)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
                         {editingSessionId === session.id ? (
@@ -442,9 +402,9 @@ const Garage = () => {
             className="editing-input"
           />
         ) : (
-          <h2 onDoubleClick={handleTitleDoubleClick}>{sessionTitle}</h2>
+          <h2 onContextMenu={handleTitleContextMenu}>{sessionTitle}</h2>
         )}
-        <p className="tip">Double click the title to edit.</p>
+        <p className="tip">Right click the title to edit.</p>
         <div className="search-controls">
           <input
             type="text"
@@ -493,22 +453,40 @@ const Garage = () => {
         </div>
       )}
       <Modal
-        isOpen={isModalOpen}
+        isOpen={isEventModalOpen}
         onRequestClose={closeModal}
-        contentLabel="Select Event Option"
+        contentLabel="Select Garage Event"
         className="modal"
         overlayClassName="overlay"
       >
-        <h2>Select Event Option</h2>
-        <p>Would you like to add log entries to the most recent event, create a new event, or cancel?</p>
-        <button onClick={() => handleModalOption('yes')}>Add to Last Event</button>
-        <button onClick={() => handleModalOption('no')}>Create New Event</button>
-        <button onClick={() => handleModalOption('cancel')}>Cancel</button>
+        <h2>Select Garage Event</h2>
+        <p>Choose an event to save this setup to, or create a new event.</p>
+        <ul className="event-select-list">
+          {events.map((ev) => (
+            <li key={ev.id}>
+              <label>
+                <input
+                  type="radio"
+                  name="eventSelect"
+                  value={ev.id}
+                  checked={selectedSaveEventId === ev.id}
+                  onChange={() => setSelectedSaveEventId(ev.id)}
+                />
+                {ev.name}
+              </label>
+            </li>
+          ))}
+        </ul>
+        <button onClick={async () => { await saveToEvent(selectedSaveEventId); closeModal(); }}>Save</button>
+        <button onClick={async () => { await createNewEventAndSave(); closeModal(); }}>Create New Event</button>
+        <button onClick={closeModal}>Cancel</button>
       </Modal>
       <Menu id="event-menu">
+        <Item onClick={handleRenameEvent}>Rename Event</Item>
         <Item onClick={handleDeleteEvent}>Delete Event</Item>
       </Menu>
       <Menu id="session-menu">
+        <Item onClick={handleRenameSession}>Rename Session</Item>
         <Item onClick={handleDeleteSession}>Delete Session</Item>
       </Menu>
     </div>
