@@ -24,8 +24,21 @@ const TracksideWidget = () => {
   const [showCustomSessions, setShowCustomSessions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
+  const [preTemplate, setPreTemplate] = useState([]);
+  const [postTemplate, setPostTemplate] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadTemplates = async () => {
+      const templates = await window.api.getNotesTemplates();
+      const pre = templates.find(t => t.name === 'pre');
+      const post = templates.find(t => t.name === 'post');
+      setPreTemplate(pre ? pre.fields : []);
+      setPostTemplate(post ? post.fields : []);
+    };
+    loadTemplates();
+  }, []);
 
   useEffect(() => {
     if (carId) {
@@ -93,7 +106,19 @@ const TracksideWidget = () => {
     const sessionPromises = selectedSessions.map(session =>
       window.api.addSession(eventId, new Date(), 'track', session)
     );
-    await Promise.all(sessionPromises);
+    const createdSessions = await Promise.all(sessionPromises);
+
+    const preSessionNotesTemplate = preTemplate.length > 0 ? preTemplate : [];
+    const postSessionNotesTemplate = postTemplate.length > 0 ? postTemplate : [];
+
+    await Promise.all(
+      createdSessions.map(session =>
+        Promise.all([
+          window.api.addPreSessionNotes(session.id, preSessionNotesTemplate),
+          window.api.addPostSessionNotes(session.id, postSessionNotesTemplate)
+        ])
+      )
+    );
 
     setCurrentEvent(newEvent);
     setShowForm(false);
