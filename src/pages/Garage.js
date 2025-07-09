@@ -455,12 +455,12 @@ const Garage = () => {
       <Modal
         isOpen={isEventModalOpen}
         onRequestClose={closeModal}
-        contentLabel="Select Garage Event"
-        className="modal"
+        contentLabel="Select Folder"
+        className="modal event-modal"
         overlayClassName="overlay"
       >
-        <h2>Select Garage Event</h2>
-        <p>Choose an event to save this setup to, or create a new event.</p>
+        <h2>Select Folder</h2>
+        <p>Choose a folder to save this setup to, or create a new folder.</p>
         <ul className="event-select-list">
           {events.map((ev) => (
             <li key={ev.id}>
@@ -477,9 +477,11 @@ const Garage = () => {
             </li>
           ))}
         </ul>
-        <button onClick={async () => { await saveToEvent(selectedSaveEventId); closeModal(); }}>Save</button>
-        <button onClick={async () => { await createNewEventAndSave(); closeModal(); }}>Create New Event</button>
-        <button onClick={closeModal}>Cancel</button>
+        <div className="event-modal-buttons">
+          <button onClick={async () => { await saveToEvent(selectedSaveEventId); closeModal(); }}>Save</button>
+          <button onClick={async () => { await createNewEventAndSave(); closeModal(); }}>Create New Folder</button>
+          <button onClick={closeModal}>Cancel</button>
+        </div>
       </Modal>
       <Menu id="event-menu">
         <Item onClick={handleRenameEvent}>Rename Event</Item>
