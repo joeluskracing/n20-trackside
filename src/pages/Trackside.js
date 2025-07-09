@@ -332,7 +332,7 @@ const Trackside = () => {
   const handleDeleteEvent = async ({ props }) => {
     setModalMessage('Are you sure you want to delete this event? This action cannot be undone and will remove all associated sessions and data.');
     setIsModalOpen(true);
-    setModalCallback(() => async (confirm) => {
+    setModalCallback(async (confirm) => {
       if (confirm) {
         try {
           await window.api.deleteEvent(props.item.id);
@@ -469,7 +469,7 @@ const Trackside = () => {
   const handleDeleteSession = async ({ props }) => {
     setModalMessage('Are you sure you want to delete this session? This action cannot be undone and will remove all associated data.');
     setIsModalOpen(true);
-    setModalCallback(() => async (confirm) => {
+    setModalCallback(async (confirm) => {
       if (confirm) {
         try {
           if (currentSession === props.session.id) {
