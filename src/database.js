@@ -32,6 +32,10 @@ const Track = sequelize.define('Track', {
   name: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  photo: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   timestamps: true
@@ -333,7 +337,7 @@ Event.hasOne(EventInfo, { foreignKey: 'eventId', onDelete: 'CASCADE' });
 EventInfo.belongsTo(Event, { foreignKey: 'eventId', onDelete: 'CASCADE' });
 
 // Sync database and prepopulate with the "Garage" track
-sequelize.sync({ force: false }).then(async () => {  // Do not use force: true in production as it drops and recreates the tables
+sequelize.sync({ alter: true }).then(async () => {  // Do not use force: true in production as it drops and recreates the tables
   console.log("Database & tables synchronized!");
 
   // Prepopulate the "Garage" track

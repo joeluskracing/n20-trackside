@@ -475,36 +475,44 @@ const Trackside = () => {
               ))}
             </ul>
             <div className="event-info box">
-              {isEditingInfo ? (
-                <>
-                  <div className="form-group">
-                    <label>Track:</label>
-                    <input type="text" list="track-options" value={editTrack} onChange={(e) => setEditTrack(e.target.value)} />
-                    <datalist id="track-options">
-                      {tracks.map((track, index) => (
-                        <option key={index} value={track.name} />
-                      ))}
-                    </datalist>
-                  </div>
-                  <div className="form-group">
-                    <label>Event Name:</label>
-                    <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label>Event Date:</label>
-                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
-                  </div>
-                  <button onClick={saveEventInfo}>💾</button>
-                  <button onClick={cancelEditInfo}>Cancel</button>
-                </>
-              ) : (
-                <>
-                  <div className="info-row"><strong>Track:</strong> {tracks.find(t => t.id === currentEvent.trackId)?.name}</div>
-                  <div className="info-row"><strong>Event:</strong> {currentEvent.name}</div>
-                  <div className="info-row"><strong>Date:</strong> {new Date(currentEvent.date).toISOString().split('T')[0]}</div>
-                  <button className="edit-info" onClick={startEditInfo}>✏️</button>
-                </>
-              )}
+              {(() => {
+                const track = tracks.find(t => t.id === currentEvent.trackId);
+                return track && track.photo ? (
+                  <img src={track.photo} alt={track.name} className="track-photo" />
+                ) : null;
+              })()}
+              <div className="event-info-content">
+                {isEditingInfo ? (
+                  <>
+                    <div className="form-group">
+                      <label>Track:</label>
+                      <input type="text" list="track-options" value={editTrack} onChange={(e) => setEditTrack(e.target.value)} />
+                      <datalist id="track-options">
+                        {tracks.map((track, index) => (
+                          <option key={index} value={track.name} />
+                        ))}
+                      </datalist>
+                    </div>
+                    <div className="form-group">
+                      <label>Event Name:</label>
+                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                      <label>Event Date:</label>
+                      <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
+                    </div>
+                    <button onClick={saveEventInfo}>💾</button>
+                    <button onClick={cancelEditInfo}>Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <div className="info-row"><strong>Track:</strong> {tracks.find(t => t.id === currentEvent.trackId)?.name}</div>
+                    <div className="info-row"><strong>Event:</strong> {currentEvent.name}</div>
+                    <div className="info-row"><strong>Date:</strong> {new Date(currentEvent.date).toISOString().split('T')[0]}</div>
+                    <button className="edit-info" onClick={startEditInfo}>✏️</button>
+                  </>
+                )}
+              </div>
             </div>
             <div className="event-conditions box">
               <div className="form-group">
