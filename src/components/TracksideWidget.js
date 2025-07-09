@@ -162,7 +162,7 @@ const TracksideWidget = () => {
 const handleModalOption = async (option) => {
     console.debug('Modal option selected:', option);
     const cb = modalCallback;
-    const hasCallback = Boolean(cb);
+    const hasCallback = typeof cb === 'function';
     console.debug('Has modal callback:', hasCallback);
     closeModal();
     if (hasCallback) {
