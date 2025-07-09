@@ -69,13 +69,14 @@ input:focus, select:focus, textarea:focus {
   position: absolute;
   inset: 0;
   background-image: var(--track-photo);
-  background-size: cover;
+  background-size: 50% auto;
+  background-repeat: no-repeat;
   background-position: center;
   filter: grayscale(100%);
   opacity: 0.3;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-          mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 25%, black 75%, transparent);
 }
 
 .event-button.running {
