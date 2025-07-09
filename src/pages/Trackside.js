@@ -365,6 +365,10 @@ const Trackside = () => {
     updated.splice(index, 0, moved);
     setSessions(updated);
     setDraggedTabIndex(null);
+    if (currentEvent) {
+      const order = updated.map(s => s.id);
+      localStorage.setItem(`sessionOrder_${currentEvent.id}`, JSON.stringify(order));
+    }
   };
 
   const handleTableLightboxClose = () => {
@@ -392,8 +396,12 @@ const Trackside = () => {
       await window.api.updatePreSessionNotes(currentSession, preSessionNotes);
       await window.api.updatePostSessionNotes(currentSession, postSessionNotes);
       await window.api.updateEventInfo(currentEvent.id, eventInfo.temperature, eventInfo.humidity, eventInfo.notes);
-  
+
       // Refresh the sessions to ensure data is up-to-date but preserve current session
+      if (currentEvent && sessions.length > 0) {
+        const order = sessions.map(s => s.id);
+        localStorage.setItem(`sessionOrder_${currentEvent.id}`, JSON.stringify(order));
+      }
       await loadSessions(currentEvent.id);
       setCurrentSession(currentSession); // Ensure the selected session remains highlighted
   
