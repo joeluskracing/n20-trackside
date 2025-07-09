@@ -159,14 +159,15 @@ const TracksideWidget = () => {
     setModalCallback(null);
   };
 
-  const handleModalOption = async (option) => {
+const handleModalOption = async (option) => {
     console.debug('Modal option selected:', option);
-    const hasCallback = Boolean(modalCallback);
+    const cb = modalCallback;
+    const hasCallback = Boolean(cb);
     console.debug('Has modal callback:', hasCallback);
     closeModal();
     if (hasCallback) {
       try {
-        await modalCallback(option);
+        await cb(option);
         console.debug('Modal callback finished');
       } catch (error) {
         console.error('Error in modal callback:', error);
