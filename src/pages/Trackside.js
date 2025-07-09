@@ -49,6 +49,7 @@ const Trackside = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
+  const [modalMessage, setModalMessage] = useState('');
   const [preTemplate, setPreTemplate] = useState([]);
   const [postTemplate, setPostTemplate] = useState([]);
   const [eventInfo, setEventInfo] = useState({ temperature: '', humidity: '', notes: '' });
@@ -314,6 +315,7 @@ const Trackside = () => {
   };
 
   const handleDeleteEvent = async ({ props }) => {
+    setModalMessage('Are you sure you want to delete this event? This action cannot be undone and will remove all associated sessions and data.');
     setIsModalOpen(true);
     setModalCallback(() => async (confirm) => {
       if (confirm) {
@@ -330,6 +332,7 @@ const Trackside = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setModalCallback(null);
+    setModalMessage('');
   };
 
   const handleModalOption = async (option) => {
@@ -393,6 +396,24 @@ const Trackside = () => {
   const startRenameSession = ({ props }) => {
     setEditingSessionId(props.session.id);
     setEditingSessionName(props.session.name);
+  };
+
+  const handleDeleteSession = async ({ props }) => {
+    setModalMessage('Are you sure you want to delete this session? This action cannot be undone and will remove all associated data.');
+    setIsModalOpen(true);
+    setModalCallback(() => async (confirm) => {
+      if (confirm) {
+        try {
+          if (currentSession === props.session.id) {
+            setCurrentSession(null);
+          }
+          await window.api.deleteSession(props.session.id);
+          await loadSessions(currentEvent.id);
+        } catch (error) {
+          console.error('Error deleting session:', error);
+        }
+      }
+    });
   };
 
   const saveSessionName = async () => {
@@ -826,7 +847,7 @@ const Trackside = () => {
         overlayClassName="overlay"
       >
         <h2>Confirm Deletion</h2>
-        <p>Are you sure you want to delete this event? This action cannot be undone and will remove all associated sessions and data.</p>
+        <p>{modalMessage}</p>
         <button onClick={() => handleModalOption(true)}>Yes</button>
         <button onClick={() => handleModalOption(false)}>No</button>
       </Modal>
@@ -835,6 +856,7 @@ const Trackside = () => {
       </Menu>
       <Menu id="session-menu">
         <Item onClick={startRenameSession}>Rename Session</Item>
+        <Item onClick={handleDeleteSession}>Delete Session</Item>
       </Menu>
     </div>
   );
