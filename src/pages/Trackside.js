@@ -30,6 +30,7 @@ const Trackside = () => {
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState(new Date().toISOString().split('T')[0]);
   const [sessions, setSessions] = useState([]);
+  const [draggedTabIndex, setDraggedTabIndex] = useState(null);
   const [newSessionName, setNewSessionName] = useState('');
   const [selectedSessions, setSelectedSessions] = useState(['Practice', 'Heat', 'Feature']);
   const [showForm, setShowForm] = useState(false);
@@ -120,9 +121,18 @@ const Trackside = () => {
   const loadSessions = async (eventId) => {
     try {
       const fetchedSessions = await window.api.getSessions(eventId);
-      setSessions(fetchedSessions);
-      if (!currentSession && fetchedSessions.length > 0) {
-        setCurrentSession(fetchedSessions[0].id);
+      const stored = localStorage.getItem(`sessionOrder_${eventId}`);
+      let ordered = fetchedSessions;
+      if (stored) {
+        const order = JSON.parse(stored);
+        const map = new Map(fetchedSessions.map(s => [s.id, s]));
+        ordered = order.map(id => map.get(id)).filter(Boolean);
+        const remaining = fetchedSessions.filter(s => !order.includes(s.id));
+        ordered = [...ordered, ...remaining];
+      }
+      setSessions(ordered);
+      if (!currentSession && ordered.length > 0) {
+        setCurrentSession(ordered[0].id);
       }
     } catch (error) {
       console.error('Error loading sessions:', error);
@@ -340,6 +350,19 @@ const Trackside = () => {
     setShowTableLightbox(true);
   };
 
+  const handleTabDragStart = (index) => {
+    setDraggedTabIndex(index);
+  };
+
+  const handleTabDrop = (index) => {
+    if (draggedTabIndex === null || draggedTabIndex === index) return;
+    const updated = [...sessions];
+    const [moved] = updated.splice(draggedTabIndex, 1);
+    updated.splice(index, 0, moved);
+    setSessions(updated);
+    setDraggedTabIndex(null);
+  };
+
   const handleTableLightboxClose = () => {
     setShowTableLightbox(false);
     setCurrentPart(null);
@@ -455,6 +478,15 @@ const Trackside = () => {
     setIsEditingInfo(false);
   };
 
+  useEffect(() => {
+    return () => {
+      if (currentEvent && sessions.length > 0) {
+        const order = sessions.map(s => s.id);
+        localStorage.setItem(`sessionOrder_${currentEvent.id}`, JSON.stringify(order));
+      }
+    };
+  }, [currentEvent, sessions]);
+
   return (
     <div className="trackside">
       <ToastContainer />
@@ -462,18 +494,6 @@ const Trackside = () => {
         <div className="dashboard">
           <div className="left-column">
             <h2>{currentEvent.name}</h2>
-            <ul>
-              {sessions.map((session, index) => (
-                <li key={index}>
-                  <button
-                    className={`session-button ${session.id == currentSession ? 'active' : ''}`}
-                    onClick={() => handleSessionClick(session.id)}
-                  >
-                    {session.name || session}
-                  </button>
-                </li>
-              ))}
-            </ul>
             <div className="event-info box">
               {(() => {
                 const track = tracks.find(t => t.id === currentEvent.trackId);
@@ -531,7 +551,21 @@ const Trackside = () => {
             <button className="end-event" onClick={handleEndEvent}>End Event</button>
           </div>
           <div className="right-column">
-            <h2>{sessions.find(s => s.id == currentSession)?.name || ''}</h2>
+            <div className="session-tabs">
+              {sessions.map((session, index) => (
+                <div
+                  key={session.id}
+                  className={`session-tab ${session.id == currentSession ? 'active' : ''}`}
+                  draggable
+                  onDragStart={() => handleTabDragStart(index)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleTabDrop(index)}
+                  onClick={() => handleSessionClick(session.id)}
+                >
+                  {session.name || session}
+                </div>
+              ))}
+            </div>
             <div className="notes-columns">
               <div className="box pre-notes">
                 <h2>Pre-Session Notes</h2>

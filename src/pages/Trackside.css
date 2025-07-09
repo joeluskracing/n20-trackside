@@ -235,3 +235,26 @@ li {
   width: 33%;
   margin: 0 auto;
 }
+
+.session-tabs {
+  display: flex;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.session-tab {
+  padding: 0.5rem 1rem;
+  margin-right: 2px;
+  cursor: pointer;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  user-select: none;
+}
+
+.session-tab.active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
