@@ -64,6 +64,18 @@ const Garage = () => {
       setParts(sortedParts);
 
       await initializeValues(sortedParts, partsValues);
+
+      const storedValues = localStorage.getItem('garageSetupValues');
+      if (storedValues) {
+        setValues(JSON.parse(storedValues));
+        localStorage.removeItem('garageSetupValues');
+      }
+      const storedTitle = localStorage.getItem('garageSetupTitle');
+      if (storedTitle) {
+        setSessionTitle(storedTitle);
+        localStorage.removeItem('garageSetupTitle');
+      }
+
       groupPartsByLocation(sortedParts);
     } catch (error) {
       console.error('Error loading parts:', error);
