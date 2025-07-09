@@ -254,6 +254,16 @@ li {
   user-select: none;
 }
 
+.session-tab.add-tab {
+  font-weight: bold;
+}
+
+.session-tab input {
+  width: 100%;
+  border: none;
+  background: transparent;
+}
+
 .session-tab.active {
   background-color: var(--primary-color);
   color: #fff;

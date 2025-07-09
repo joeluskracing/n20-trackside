@@ -44,6 +44,8 @@ const Trackside = () => {
   const [showAll, setShowAll] = useState(false);
   const [showTableLightbox, setShowTableLightbox] = useState(false);
   const [currentPart, setCurrentPart] = useState(null);
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [editingSessionName, setEditingSessionName] = useState('');
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalCallback, setModalCallback] = useState(null);
@@ -371,6 +373,56 @@ const Trackside = () => {
     }
   };
 
+  const handleSessionContextMenu = (e, session) => {
+    e.preventDefault();
+    contextMenu.show({
+      id: 'session-menu',
+      event: e,
+      props: { session }
+    });
+  };
+
+  const startRenameSession = ({ props }) => {
+    setEditingSessionId(props.session.id);
+    setEditingSessionName(props.session.name);
+  };
+
+  const saveSessionName = async () => {
+    if (editingSessionId) {
+      try {
+        await window.api.updateSessionName(editingSessionId, editingSessionName);
+        const updated = sessions.map(s =>
+          s.id === editingSessionId ? { ...s, name: editingSessionName } : s
+        );
+        setSessions(updated);
+      } catch (error) {
+        console.error('Error updating session name:', error);
+      }
+    }
+    setEditingSessionId(null);
+    setEditingSessionName('');
+  };
+
+  const handleAddNewSession = async () => {
+    if (!currentEvent) return;
+    try {
+      const newSession = await window.api.addSession(currentEvent.id, new Date(), 'track', 'New Session');
+      await Promise.all([
+        window.api.addPreSessionNotes(newSession.id, preTemplate.length > 0 ? preTemplate : []),
+        window.api.addPostSessionNotes(newSession.id, postTemplate.length > 0 ? postTemplate : [])
+      ]);
+      const updated = [...sessions, newSession];
+      setSessions(updated);
+      setCurrentSession(newSession.id);
+      const order = updated.map(s => s.id);
+      localStorage.setItem(`sessionOrder_${currentEvent.id}`, JSON.stringify(order));
+      setEditingSessionId(newSession.id);
+      setEditingSessionName(newSession.name);
+    } catch (error) {
+      console.error('Error adding session:', error);
+    }
+  };
+
   const handleTableLightboxClose = () => {
     setShowTableLightbox(false);
     setCurrentPart(null);
@@ -573,10 +625,23 @@ const Trackside = () => {
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleTabDrop(index)}
                   onClick={() => handleSessionClick(session.id)}
+                  onContextMenu={(e) => handleSessionContextMenu(e, session)}
                 >
-                  {session.name || session}
+                  {editingSessionId === session.id ? (
+                    <input
+                      type="text"
+                      value={editingSessionName}
+                      onChange={(e) => setEditingSessionName(e.target.value)}
+                      onBlur={saveSessionName}
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveSessionName(); }}
+                      autoFocus
+                    />
+                  ) : (
+                    session.name || session
+                  )}
                 </div>
               ))}
+              <div className="session-tab add-tab" onClick={handleAddNewSession}>+</div>
             </div>
             <div className="notes-columns">
               <div className="box pre-notes">
@@ -758,6 +823,9 @@ const Trackside = () => {
       </Modal>
       <Menu id="event-menu">
         <Item onClick={handleDeleteEvent}>Delete Event</Item>
+      </Menu>
+      <Menu id="session-menu">
+        <Item onClick={startRenameSession}>Rename Session</Item>
       </Menu>
     </div>
   );
