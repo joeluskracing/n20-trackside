@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLoading } from '../context/LoadingContext';
 import './LoadingOverlay.css';
 
@@ -7,11 +7,21 @@ const flagIcon =
 
 const LoadingOverlay = () => {
   const { isLoading } = useLoading();
+  const [visible, setVisible] = useState(false);
 
-  if (!isLoading) return null;
+  useEffect(() => {
+    if (isLoading) {
+      setVisible(true);
+    } else {
+      const timer = setTimeout(() => setVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  if (!visible) return null;
 
   return (
-    <div className="loading-overlay">
+    <div className={`loading-overlay ${isLoading ? 'show' : ''}`}> 
       <img src={flagIcon} alt="loading" className="loading-icon" />
     </div>
   );
