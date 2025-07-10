@@ -284,7 +284,7 @@ const ManageParts = () => {
             </div>
           ))}
         </div>
-        <button className="save-notes" onClick={handleSave}>Save Parts</button>
+        <button className="save-notes" onClick={handleSave}>Save Car</button>
       </div>
     </div>
   );

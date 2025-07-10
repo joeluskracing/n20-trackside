@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
+import './CreateCar.css';
 
 const CreateCar = () => {
   const [name, setName] = useState('');
   const [templateId, setTemplateId] = useState('');
   const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
-  const { loadCars } = useCar(); // Get loadCars from context
+  const { loadCars, setSelectedCar } = useCar();
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -23,7 +24,8 @@ const CreateCar = () => {
         await window.api.applyTemplateToCar(templateId, car.id);
       }
       loadCars();
-      navigate('/');
+      setSelectedCar(car.id);
+      navigate('/manage-parts', { state: { carId: car.id, carName: car.name } });
     });
   };
 
