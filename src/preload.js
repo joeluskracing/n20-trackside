@@ -234,6 +234,20 @@ contextBridge.exposeInMainWorld('api', {
   deleteEvent: async (eventId) => {
     try {
       console.debug('preload: deleting event', eventId);
+
+      // Remove all sessions and their related data first to avoid
+      // foreign key constraint errors
+      const sessions = await Session.findAll({ where: { eventId } });
+      for (const session of sessions) {
+        const sid = session.id;
+        await SessionPartsValues.destroy({ where: { sessionId: sid } });
+        await PreSessionNotes.destroy({ where: { sessionId: sid } });
+        await PostSessionNotes.destroy({ where: { sessionId: sid } });
+      }
+      await Session.destroy({ where: { eventId } });
+
+      // Remove event info then the event itself
+      await EventInfo.destroy({ where: { eventId } });
       await Event.destroy({ where: { id: eventId } });
       console.debug('preload: event deleted');
     } catch (error) {
@@ -243,8 +257,12 @@ contextBridge.exposeInMainWorld('api', {
   deleteSession: async (sessionId) => {
     try {
       console.debug('preload: deleting session', sessionId);
-      await SessionPartsValues.destroy({ where: { sessionId: sessionId } });
+
+      await SessionPartsValues.destroy({ where: { sessionId } });
+      await PreSessionNotes.destroy({ where: { sessionId } });
+      await PostSessionNotes.destroy({ where: { sessionId } });
       await Session.destroy({ where: { id: sessionId } });
+
       console.debug('preload: session deleted');
     } catch (error) {
       console.error('Error deleting session:', error);
