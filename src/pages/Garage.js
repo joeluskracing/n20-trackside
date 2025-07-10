@@ -41,6 +41,8 @@ const Garage = () => {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [selectedSaveEventId, setSelectedSaveEventId] = useState(null);
+  const [dragInfo, setDragInfo] = useState(null);
+  const [draggingSessionId, setDraggingSessionId] = useState(null);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -151,7 +153,18 @@ const Garage = () => {
       const fetchedEvents = await window.api.getEventsWithSessions();
       const filteredEvents = fetchedEvents.filter(event => event.carId == carId && event.trackId == 1);
       const sortedEvents = filteredEvents.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setEvents(sortedEvents);
+      const orderedEvents = sortedEvents.map(ev => {
+        const stored = localStorage.getItem(`garageSessionOrder_${ev.id}`);
+        if (stored) {
+          const order = JSON.parse(stored);
+          const map = new Map(ev.Sessions.map(s => [s.id, s]));
+          const ordered = order.map(id => map.get(id)).filter(Boolean);
+          const remaining = ev.Sessions.filter(s => !order.includes(s.id));
+          ev.Sessions = [...ordered, ...remaining];
+        }
+        return ev;
+      });
+      setEvents(orderedEvents);
     } catch (error) {
       console.error('Error loading events with sessions:', error);
     }
@@ -250,6 +263,9 @@ const Garage = () => {
         await window.api.updateEventName(editingEventId, editingName);
       } else if (editingSessionId) {
         await window.api.updateSessionName(editingSessionId, editingName);
+        if (editingSessionId === currentSessionId) {
+          setSessionTitle(editingName);
+        }
       }
       setEditingEventId(null);
       setEditingSessionId(null);
@@ -323,6 +339,44 @@ const Garage = () => {
     setShowAll(false);
   };
 
+  const handleSessionDragStart = (eventId, index, sessionId) => {
+    setDragInfo({ eventId, index });
+    setDraggingSessionId(sessionId);
+  };
+
+  const handleEventDragOver = (eventId) => {
+    if (selectedEventId !== eventId) {
+      setSelectedEventId(eventId);
+    }
+  };
+
+  const saveSessionOrder = (ev) => {
+    const order = ev.Sessions.map(s => s.id);
+    localStorage.setItem(`garageSessionOrder_${ev.id}`, JSON.stringify(order));
+  };
+
+  const handleSessionDrop = async (eventId, index) => {
+    if (!dragInfo) return;
+    const { eventId: fromEventId, index: fromIndex } = dragInfo;
+    const updated = [...events];
+    const fromEvent = updated.find(ev => ev.id === fromEventId);
+    const toEvent = updated.find(ev => ev.id === eventId);
+    if (!fromEvent || !toEvent) return;
+    const [moved] = fromEvent.Sessions.splice(fromIndex, 1);
+    moved.eventId = eventId;
+    toEvent.Sessions.splice(index, 0, moved);
+    setEvents(updated);
+    setDragInfo(null);
+    setDraggingSessionId(null);
+    try {
+      await window.api.updateSession(moved.id, { eventId });
+    } catch (error) {
+      console.error('Error updating session:', error);
+    }
+    saveSessionOrder(fromEvent);
+    saveSessionOrder(toEvent);
+  };
+
   return (
     <div className="garage">
       <ToastContainer />
@@ -346,17 +400,26 @@ const Garage = () => {
                   className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
                   onClick={() => handleEventClick(event.id)}
                   onContextMenu={(e) => handleContextMenu(e, event, 'event')}
+                  onDragOver={(e) => { e.preventDefault(); handleEventDragOver(event.id); }}
+                  onDrop={() => handleSessionDrop(event.id, event.Sessions.length)}
                 >
                   {event.name}
                 </button>
               )}
               {selectedEventId === event.id && (
-                <ul>
+                <ul
+                  onDragOver={(e) => { e.preventDefault(); handleEventDragOver(event.id); }}
+                  onDrop={() => handleSessionDrop(event.id, event.Sessions.length)}
+                >
                   {event.Sessions && event.Sessions.length > 0 ? (
                     event.Sessions.map((session, index) => (
                       <li
                         key={index}
-                        className="session-item"
+                        className={`session-item${currentSessionId === session.id ? ' selected' : ''}${draggingSessionId === session.id ? ' dragging' : ''}`}
+                        draggable
+                        onDragStart={() => handleSessionDragStart(event.id, index, session.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => handleSessionDrop(event.id, index)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
                         {editingSessionId === session.id ? (

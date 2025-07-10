@@ -291,6 +291,13 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error updating session name:', error);
     }
   },
+  updateSession: async (sessionId, data) => {
+    try {
+      await Session.update(data, { where: { id: sessionId } });
+    } catch (error) {
+      console.error('Error updating session:', error);
+    }
+  },
   getTracks: async () => {
     try {
       const tracks = await Track.findAll();
