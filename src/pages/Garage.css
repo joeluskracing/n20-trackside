@@ -158,8 +158,11 @@ button:hover {
 }
 
 .session-item.selected {
-  background-color: #d0eaff;
-  font-weight: bold;
+    color: white;
+    background-color: var(--primary-dark);
+    /* font-weight: bold; */
+    Padding: 10px;
+    border-radius: 4px;
 }
 
 .session-item.dragging {
