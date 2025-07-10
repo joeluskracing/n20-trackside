@@ -269,9 +269,16 @@ li {
 }
 
 .session-tab input {
-  width: 100%;
+  width: auto;
+  min-width: 1ch;
   border: none;
   background: transparent;
+  color: inherit;
+}
+
+.session-tab.active input {
+  color: #fff;
+  border-bottom: 1px solid #fff;
 }
 
 .session-tab.active {

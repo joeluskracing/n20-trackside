@@ -224,6 +224,12 @@ button:hover {
   margin: 0;
   box-sizing: border-box;
 }
+
+.editing-input.inline {
+  display: inline-block;
+  width: auto;
+  min-width: 1ch;
+}
 .search-controls {
   display: flex;
   align-items: center;

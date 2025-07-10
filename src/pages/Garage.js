@@ -277,6 +277,13 @@ const Garage = () => {
 
   const handleTitleContextMenu = (e) => {
     e.preventDefault();
+    contextMenu.show({
+      id: 'title-menu',
+      event: e.nativeEvent || e
+    });
+  };
+
+  const startRenameTitle = () => {
     setEditingTitle(true);
     setEditingName(sessionTitle);
   };
@@ -386,26 +393,26 @@ const Garage = () => {
         {events.length > 0 ? (
           events.map((event, index) => (
             <div key={index} className="event-group">
-              {editingEventId === event.id ? (
-                <input
-                  type="text"
-                  value={editingName}
-                  onChange={handleEditingNameChange}
-                  onBlur={handleEditingNameBlur}
-                  autoFocus
-                  className="editing-input"
-                />
-              ) : (
-                <button
-                  className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
-                  onClick={() => handleEventClick(event.id)}
-                  onContextMenu={(e) => handleContextMenu(e, event, 'event')}
-                  onDragOver={(e) => { e.preventDefault(); handleEventDragOver(event.id); }}
-                  onDrop={() => handleSessionDrop(event.id, event.Sessions.length)}
-                >
-                  {event.name}
-                </button>
-              )}
+              <button
+                className={`accordion-button ${selectedEventId === event.id ? 'expanded' : ''}`}
+                onClick={() => handleEventClick(event.id)}
+                onContextMenu={(e) => handleContextMenu(e, event, 'event')}
+                onDragOver={(e) => { e.preventDefault(); handleEventDragOver(event.id); }}
+                onDrop={() => handleSessionDrop(event.id, event.Sessions.length)}
+              >
+                {editingEventId === event.id ? (
+                  <input
+                    type="text"
+                    value={editingName}
+                    onChange={handleEditingNameChange}
+                    onBlur={handleEditingNameBlur}
+                    autoFocus
+                    className="editing-input inline"
+                  />
+                ) : (
+                  event.name
+                )}
+              </button>
               {selectedEventId === event.id && (
                 <ul
                   onDragOver={(e) => { e.preventDefault(); handleEventDragOver(event.id); }}
@@ -422,24 +429,24 @@ const Garage = () => {
                         onDrop={() => handleSessionDrop(event.id, index)}
                         onContextMenu={(e) => handleContextMenu(e, session, 'session')}
                       >
-                        {editingSessionId === session.id ? (
-                          <input
-                            type="text"
-                            value={editingName}
-                            onChange={handleEditingNameChange}
-                            onBlur={handleEditingNameBlur}
-                            autoFocus
-                            className="editing-input"
-                          />
+                        <span>
+                          {editingSessionId === session.id ? (
+                            <input
+                              type="text"
+                              value={editingName}
+                              onChange={handleEditingNameChange}
+                              onBlur={handleEditingNameBlur}
+                              autoFocus
+                              className="editing-input inline"
+                            />
+                          ) : (
+                            session.name
+                          )}
+                        </span>
+                        {currentSessionId === session.id ? (
+                          <button className="load-btn" disabled>Loaded</button>
                         ) : (
-                          <>
-                            <span>{session.name}</span>
-                            {currentSessionId === session.id ? (
-                              <button className="load-btn" disabled>Loaded</button>
-                            ) : (
-                              <button className="load-btn" onClick={() => handleLoadSession(session)}>Load</button>
-                            )}
-                          </>
+                          <button className="load-btn" onClick={() => handleLoadSession(session)}>Load</button>
                         )}
                       </li>
                     ))
@@ -553,6 +560,9 @@ const Garage = () => {
       <Menu id="session-menu">
         <Item onClick={handleRenameSession}>Rename Session</Item>
         <Item onClick={handleDeleteSession}>Delete Session</Item>
+      </Menu>
+      <Menu id="title-menu">
+        <Item onClick={startRenameTitle}>Rename Title</Item>
       </Menu>
     </div>
   );

@@ -744,6 +744,7 @@ const handleModalOption = async (option) => {
                       onBlur={saveSessionName}
                       onKeyDown={(e) => { if (e.key === 'Enter') saveSessionName(); }}
                       autoFocus
+                      style={{ width: `${Math.max(editingSessionName.length, 1)}ch` }}
                     />
                   ) : (
                     session.name || session
