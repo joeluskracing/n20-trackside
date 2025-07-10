@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './Settings.css';
 import { useCar } from '../context/CarContext';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('notes');
@@ -9,6 +12,9 @@ const Settings = () => {
   const [carTemplates, setCarTemplates] = useState([]);
   const [tracks, setTracks] = useState([]);
   const { cars, loadCars } = useCar();
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateCarId, setTemplateCarId] = useState(null);
 
   const loadCarTemplates = async () => {
     const t = await window.api.getCarTemplates();
@@ -70,11 +76,22 @@ const Settings = () => {
     alert('Notes templates saved');
   };
 
-  const handleSaveTemplate = async (carId) => {
-    const name = prompt('Template Name?');
-    if (!name) return;
-    await window.api.addCarTemplate(carId, name);
+  const openTemplateModal = (carId) => {
+    setTemplateCarId(carId);
+    setTemplateName('');
+    setIsTemplateModalOpen(true);
+  };
+
+  const closeTemplateModal = () => {
+    setIsTemplateModalOpen(false);
+    setTemplateCarId(null);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!templateName || !templateCarId) return;
+    await window.api.addCarTemplate(templateCarId, templateName);
     loadCarTemplates();
+    closeTemplateModal();
   };
 
   const handlePhotoUpload = (trackId, e) => {
@@ -162,7 +179,7 @@ const Settings = () => {
               <ul>
                 {cars.map(c => (
                   <li key={c.id}>
-                    {c.name} <button onClick={() => handleSaveTemplate(c.id)}>Save as Template</button>
+                    {c.name} <button onClick={() => openTemplateModal(c.id)}>Save as Template</button>
                   </li>
                 ))}
               </ul>
@@ -191,6 +208,25 @@ const Settings = () => {
           </div>
         )}
       </div>
+      <Modal
+        isOpen={isTemplateModalOpen}
+        onRequestClose={closeTemplateModal}
+        contentLabel="Save Template"
+        className="modal template-modal"
+        overlayClassName="overlay"
+      >
+        <h2>Template Name</h2>
+        <input
+          type="text"
+          value={templateName}
+          onChange={e => setTemplateName(e.target.value)}
+          placeholder="Template Name"
+        />
+        <div className="event-modal-buttons">
+          <button onClick={handleSaveTemplate}>Save</button>
+          <button onClick={closeTemplateModal}>Cancel</button>
+        </div>
+      </Modal>
     </div>
   );
 };
