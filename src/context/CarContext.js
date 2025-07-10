@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLoading } from './LoadingContext';
 
 const CarContext = createContext();
 
@@ -9,6 +10,7 @@ export const useCar = () => {
 export const CarProvider = ({ children }) => {
   const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(localStorage.getItem('selectedCar') || '');
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     loadCars();
@@ -21,13 +23,17 @@ export const CarProvider = ({ children }) => {
   }, [selectedCar]);
 
   const loadCars = async () => {
-    const fetchedCars = await window.api.getCars();
-    setCars(fetchedCars);
+    showLoading();
+    try {
+      const fetchedCars = await window.api.getCars();
+      setCars(fetchedCars);
 
-    // Set default car if none is selected
-    if (!selectedCar && fetchedCars.length > 0) {
-      setSelectedCar(fetchedCars[0].id);
-      localStorage.setItem('selectedCar', fetchedCars[0].id);
+      if (!selectedCar && fetchedCars.length > 0) {
+        setSelectedCar(fetchedCars[0].id);
+        localStorage.setItem('selectedCar', fetchedCars[0].id);
+      }
+    } finally {
+      hideLoading();
     }
   };
 
