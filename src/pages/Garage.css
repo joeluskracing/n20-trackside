@@ -162,6 +162,10 @@ button:hover {
   font-weight: bold;
 }
 
+.session-item.dragging {
+  opacity: 0.5;
+}
+
 .load-btn {
   margin-left: 0.5rem;
 }
