@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { useCar } from '../context/CarContext';
+import { useLoading } from '../context/LoadingContext';
 import TracksideWidget from '../components/TracksideWidget';
 import StatsWidget from '../components/StatsWidget';
 
@@ -10,6 +11,7 @@ const Home = () => {
   const [parts, setParts] = useState([]);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     loadCars();
@@ -17,9 +19,13 @@ const Home = () => {
 
   useEffect(() => {
     if (selectedCar) {
-      window.api.getParts(selectedCar).then((fetchedParts) => {
-        setParts(fetchedParts);
-      });
+      showLoading();
+      window.api
+        .getParts(selectedCar)
+        .then((fetchedParts) => {
+          setParts(fetchedParts);
+        })
+        .finally(() => hideLoading());
     } else {
       setParts([]);
     }
@@ -57,11 +63,14 @@ const Home = () => {
 
   const handleExportCar = async () => {
     if (!selectedCar) return;
+    showLoading();
     try {
       const filePath = await window.api.exportCarData(selectedCar);
       alert(`Car exported to ${filePath}`);
     } catch (error) {
       console.error('Error exporting car:', error);
+    } finally {
+      hideLoading();
     }
   };
 
@@ -72,12 +81,15 @@ const Home = () => {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      showLoading();
       try {
         await window.api.importCarData(file.path);
         loadCars();
         alert('Car imported successfully');
       } catch (error) {
         console.error('Error importing car:', error);
+      } finally {
+        hideLoading();
       }
     }
   };
