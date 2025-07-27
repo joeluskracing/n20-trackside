@@ -78,6 +78,23 @@ const Home = () => {
     fileInputRef.current.click();
   };
 
+  const handleDeleteCar = async () => {
+    if (!selectedCar) return;
+    const confirmDelete = window.confirm('Deleting this car will remove all associated data. Continue?');
+    if (!confirmDelete) return;
+    showLoading();
+    try {
+      await window.api.deleteCar(selectedCar);
+      setSelectedCar('');
+      localStorage.removeItem('selectedCar');
+      await loadCars();
+    } catch (error) {
+      console.error('Error deleting car:', error);
+    } finally {
+      hideLoading();
+    }
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -124,6 +141,7 @@ const Home = () => {
             <button onClick={handleCreateCar}>Add another car</button>
             <button onClick={handleExportCar} disabled={!selectedCar}>Export Car</button>
             <button onClick={handleImportButton}>Import Car</button>
+            <button onClick={handleDeleteCar} disabled={!selectedCar}>Delete Car</button>
             <input
               type="file"
               ref={fileInputRef}

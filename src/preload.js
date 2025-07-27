@@ -50,6 +50,14 @@ contextBridge.exposeInMainWorld('api', {
       console.error('Error adding car:', error);
     }
   },
+  deleteCar: async (carId) => {
+    try {
+      await Car.destroy({ where: { id: carId } });
+      await CarTemplate.destroy({ where: { carId } });
+    } catch (error) {
+      console.error('Error deleting car:', error);
+    }
+  },
   addPart: async (name, carId, unit, entryType, displayLocation, subheading, order) => {
     try {
       return await Part.create({ name, carId, unit, entryType, displayLocation, subheading, order });
