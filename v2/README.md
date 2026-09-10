@@ -4,12 +4,14 @@ A private, session-based racecar notebook rebuilt from [n20-trackside](https://g
 
 ## Use it
 
-1. Create a **Garage — Baseline** session. Enter known values by selecting a corner; unknowns stay blank.
+1. Create a **Garage — Baseline** session. Enter known values directly in the corner cards; unknowns stay blank.
 2. Create a track session such as **Clinton County — Hot laps**. Its settings copy the selected baseline; results and notes start empty.
 3. Type or dictate changes into the bottom composer. Basic commands work immediately: `RR spring 225; right front tire pressure 12 psi; started 8 finished 4`.
 4. Select **Record this run** before going on track. This locks the setup for that run. Results and driver feedback remain editable.
-5. Select **Next session** for changes made after the run. Give each run a name, date, and color.
-6. Export a reimportable session CSV, a whole-race comparison CSV, or a revision-history CSV. The readable report opens a print layout with **Print / Save PDF**.
+5. Select **Next session** for changes made after the run. Name and color it in the inline form.
+6. The visible **CSV** and **PDF** actions export the session or open the printable report. Whole-race and revision-history CSV exports are in the change log.
+
+Results, conditions, and before/after/driver notes are on the main screen. Setup and note fields save on blur (or Enter for single-line fields), with serialized writes using the latest session revision. Failed edits remain visible with a save button and are retained as drafts on this device. The paper-colored chassis locator uses the same orthographic projection for its frame, axles, and tires. Additional settings expand within each card; field definitions and units remain in an optional customization panel.
 
 Voice capture stops after 90 seconds. With AI connected, the recording is transcribed and clear adjustments are saved after you stop. Where browser speech recognition exists, basic voice commands also work before AI is connected. Ambiguous entries, photos, new sessions, and cross-session routing are staged for review. Original messages and revision changes are retained. Failed requests leave the draft intact; text drafts are temporarily retained on the current device. This is not a fully offline PWA, and AI requires a network connection.
 
