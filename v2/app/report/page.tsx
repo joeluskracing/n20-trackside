@@ -1,0 +1,11 @@
+import { requireChatGPTUser } from '@/app/chatgpt-auth';
+import { getSession } from '@/lib/trackside/store';
+import { corners,cornerNames } from '@/lib/trackside/model';
+import PrintButton from './print-button';
+export const dynamic='force-dynamic';
+async function Report({id}:{id:string}){
+ const user=await requireChatGPTUser('/report?id='+encodeURIComponent(id));
+ let s;try{s=await getSession(user.userId,id);}catch{return <div className="report"><h1>Session unavailable</h1><p>Return to Trackside and select a saved session.</p><a href="/">Open notebook</a></div>;}
+ return <main className="report"><header><div><p className="report-meta">TRACKSIDE / SETUP SHEET</p><h1>{s.track} — {s.name}</h1><p>{s.car}</p><p className="report-meta">{s.date} · Revision {s.revision} · {s.status==='recorded'?'On-track setup':'Preparing setup'}</p></div><div className="report-actions"><PrintButton/><a href={`/api/trackside?op=csv&id=${s.id}`}>Download CSV</a></div></header><div className="result-line"><span>Started: <strong>{s.notes.start||'—'}</strong></span><span>Finished: <strong>{s.notes.finish||'—'}</strong></span><span>Laps: <strong>{s.notes.laps||'—'}</strong></span></div><div className="report-grid">{corners.map(c=><section key={c}><h2>{c} · {cornerNames[c]}</h2><table><thead><tr><th>Setting</th><th>Value</th><th>Unit / reference</th></tr></thead><tbody>{s.settings.filter(p=>p.corner===c).map(p=><tr key={p.id}><td>{p.label}</td><td>{p.value||'Not recorded'}</td><td>{[p.unit,p.reference].filter(Boolean).join(' · ')}</td></tr>)}</tbody></table></section>)}</div><h2>Session notes</h2>{(['conditions','before','after','feedback'] as const).map(k=><div className="report-note" key={k}><strong>{({conditions:'Track conditions',before:'Before the run',after:'After the run',feedback:'Driver feedback'})[k]}</strong>{s.notes[k]||'Not recorded'}</div>)}{s.attachments.length>0&&<section><h2>Attached evidence</h2>{s.attachments.map(a=><p key={a.id}>{a.name}</p>)}</section>}<footer className="report-foot">Saved {s.updatedAt} · Session {s.id}<br/>Blank values are unknown. The schematic is a locator, not a measured chassis drawing. Attachment images remain in the private notebook.</footer></main>;
+}
+export default async function Page({searchParams}:{searchParams:Promise<{id?:string}>}){const p=await searchParams;return <Report id={p.id||''}/>;}
